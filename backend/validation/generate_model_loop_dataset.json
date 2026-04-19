@@ -1,0 +1,26 @@
+{
+  "dataset_version": "2026-04-12-gate1",
+  "description": "Offline replay validation set for model-loop convergence and reproducibility checks.",
+  "repeat_runs": 3,
+  "case_limit": 36,
+  "targets": [
+    { "valence": 15, "arousal": 20 },
+    { "valence": 15, "arousal": 80 },
+    { "valence": 30, "arousal": 35 },
+    { "valence": 30, "arousal": 70 },
+    { "valence": 50, "arousal": 20 },
+    { "valence": 50, "arousal": 80 },
+    { "valence": 70, "arousal": 30 },
+    { "valence": 70, "arousal": 75 },
+    { "valence": 85, "arousal": 20 },
+    { "valence": 85, "arousal": 80 }
+  ],
+  "modalities": ["audio", "text", "image", "video"],
+  "profiles": ["neurotypical", "adhd", "asd"],
+  "ages": ["child", "adult", "elderly"],
+  "thresholds": {
+    "min_median_improvement": 8.0,
+    "max_p95_final_distance": 12.0,
+    "min_determinism_rate": 1.0
+  }
+}

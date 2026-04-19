@@ -1,0 +1,31 @@
+{
+  "dataset_version": "2026-04-18-gate2",
+  "description": "Prospective pilot manifest for model-loop generation operational validation.",
+  "sync_case_limit": 24,
+  "async_case_limit": 12,
+  "poll_interval_seconds": 0.05,
+  "poll_timeout_seconds": 10.0,
+  "targets": [
+    { "valence": 15, "arousal": 20 },
+    { "valence": 15, "arousal": 80 },
+    { "valence": 30, "arousal": 35 },
+    { "valence": 30, "arousal": 70 },
+    { "valence": 50, "arousal": 20 },
+    { "valence": 50, "arousal": 80 },
+    { "valence": 70, "arousal": 30 },
+    { "valence": 70, "arousal": 75 },
+    { "valence": 85, "arousal": 20 },
+    { "valence": 85, "arousal": 80 }
+  ],
+  "modalities": ["audio", "text", "image", "video"],
+  "profiles": ["neurotypical", "adhd", "asd"],
+  "ages": ["child", "adult", "elderly"],
+  "thresholds": {
+    "max_sync_p95_latency_seconds": 0.5,
+    "max_async_p95_completion_seconds": 5.0,
+    "max_sync_error_rate": 0.0,
+    "max_async_error_rate": 0.0,
+    "min_policy_compliance_rate": 1.0,
+    "max_dead_letter_count": 0
+  }
+}

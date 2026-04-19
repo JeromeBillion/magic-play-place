@@ -1,0 +1,289 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: magic-play-place
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: magic-play-place-secrets
+  namespace: magic-play-place
+type: Opaque
+stringData:
+  API_KEY: "replace-with-strong-key"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: magic-play-place
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+          args: ["redis-server", "--appendonly", "yes"]
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: magic-play-place
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: magic-play-place
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: magic-play-place/backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: CORS_ORIGINS
+              value: "https://magic-play-place.example.com"
+            - name: INFERENCE_MODE
+              value: "mock"
+            - name: REQUIRE_API_KEY
+              value: "true"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: magic-play-place-secrets
+                  key: API_KEY
+            - name: RATE_LIMIT_ENABLED
+              value: "true"
+            - name: RATE_LIMIT_WINDOW_SECONDS
+              value: "60"
+            - name: RATE_LIMIT_MAX_REQUESTS
+              value: "30"
+            - name: ASYNC_JOB_QUEUE_ENABLED
+              value: "true"
+            - name: QUEUE_BACKEND
+              value: "redis"
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+            - name: JOB_WORKER_CONCURRENCY
+              value: "2"
+            - name: JOB_QUEUE_MAX_PENDING
+              value: "200"
+            # Default to simulation for fresh deploy safety.
+            # Promote to model_loop only after Gate 1 + Gate 2 + Gate 3 artifacts are
+            # present in the runtime image and governance sign-off is complete.
+            - name: GENERATE_MODE
+              value: "simulation"
+            - name: GENERATE_MODEL_LOOP_VALIDATED
+              value: "false"
+            - name: GENERATE_MODEL_LOOP_VALIDATION_REPORT
+              value: ""
+            - name: GENERATE_MODEL_LOOP_SIGNED_OFF
+              value: "false"
+            - name: GENERATE_MODEL_LOOP_SIGNOFF_REPORT
+              value: ""
+            - name: METRICS_ENABLED
+              value: "true"
+            - name: OTEL_ENABLED
+              value: "false"
+            - name: JOB_MAX_RETRIES
+              value: "2"
+            - name: DLQ_MAX_ITEMS
+              value: "1000"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: magic-play-place
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "8000"
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-worker
+  namespace: magic-play-place
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend-worker
+  template:
+    metadata:
+      labels:
+        app: backend-worker
+    spec:
+      containers:
+        - name: backend-worker
+          image: magic-play-place/backend:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "redis_worker.py"]
+          env:
+            - name: QUEUE_BACKEND
+              value: "redis"
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+            - name: ASYNC_JOB_QUEUE_ENABLED
+              value: "true"
+            - name: INFERENCE_MODE
+              value: "mock"
+            # Keep worker aligned with backend safety defaults.
+            - name: GENERATE_MODE
+              value: "simulation"
+            - name: GENERATE_MODEL_LOOP_VALIDATED
+              value: "false"
+            - name: GENERATE_MODEL_LOOP_VALIDATION_REPORT
+              value: ""
+            - name: GENERATE_MODEL_LOOP_SIGNED_OFF
+              value: "false"
+            - name: GENERATE_MODEL_LOOP_SIGNOFF_REPORT
+              value: ""
+            - name: OTEL_ENABLED
+              value: "false"
+            - name: JOB_MAX_RETRIES
+              value: "2"
+            - name: DLQ_MAX_ITEMS
+              value: "1000"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: magic-play-place-secrets
+                  key: API_KEY
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: magic-play-place
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: magic-play-place/frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_BASE_URL
+              value: "https://api.magic-play-place.example.com"
+            - name: NEXT_PUBLIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: magic-play-place-secrets
+                  key: API_KEY
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: magic-play-place
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 3000
+      targetPort: 3000

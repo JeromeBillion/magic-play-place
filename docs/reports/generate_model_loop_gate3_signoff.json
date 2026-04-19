@@ -1,0 +1,24 @@
+{
+  "generated_at_utc": "2026-04-18T07:55:47.216579+00:00",
+  "signoff_id": "gate3-20260418T075547Z",
+  "signatories": [
+    "platform-engineering",
+    "scientific-governance"
+  ],
+  "gate_inputs": {
+    "gate1_report": "docs/reports/generate_model_loop_gate1_baseline.json",
+    "gate1_pass": true,
+    "gate2_report": "docs/reports/generate_model_loop_gate2_pilot.json",
+    "gate2_pass": true,
+    "gate2_policy_violation_count": 0,
+    "gate2_retry_delta_generate": 0,
+    "gate2_dead_letter_delta_generate": 0
+  },
+  "decision": {
+    "approved": true,
+    "runtime_promotion": "ALLOW_GENERATE_MODE_MODEL_LOOP",
+    "commercialization_stance": "research_tooling_non_clinical_output_only",
+    "policy_reference": "docs/RESEARCH_USE_AND_EVIDENCE_POLICY.md",
+    "notes": "Gate 1 and Gate 2 passed with stable policy/telemetry checks. Model-loop remains non-clinical research output."
+  }
+}
