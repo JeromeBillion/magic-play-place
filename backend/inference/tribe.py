@@ -117,16 +117,42 @@ def run_tribe_inference(
         if preds.ndim != 2:
             raise RuntimeError(f"Unexpected prediction shape: {preds.shape}")
 
+        # AR5: Validate prediction tensor integrity before analysis
+        if bool(np.isnan(preds).any()) or bool(np.isinf(preds).any()):
+            raise RuntimeError(
+                "Prediction tensor contains NaN or Inf values. "
+                "Model output is corrupted; cannot produce reliable insights."
+            )
+        std_val = float(np.std(preds))
+        is_degenerate = std_val < 1e-9
+        if is_degenerate:
+            logger.warning(
+                "request_id=unknown tribe_degenerate_prediction std=%.2e — "
+                "constant prediction output; results flagged as low_confidence.",
+                std_val,
+            )
+
         roi_data = {
             "mean_activation": float(np.mean(preds)),
             "max_activation": float(np.max(preds)),
             "min_activation": float(np.min(preds)),
-            "std_activation": float(np.std(preds)),
+            "std_activation": std_val,
             "segment_count": len(segments),
             "profile": profile,
             "age": age,
+            "degenerate": is_degenerate,
         }
         insights = analyze_fmri_roi(roi_data, stimulus_type)
+        if is_degenerate:
+            from llm_analyst import EvidenceTag
+            tags = insights.get("evidence_tags", [])
+            if EvidenceTag.low_confidence not in tags:
+                tags.insert(0, EvidenceTag.low_confidence)
+                insights["evidence_tags"] = tags
+            insights["scientific_disclaimer"] = (
+                "LOW CONFIDENCE — Degenerate (constant) prediction detected (std ≈ 0). "
+                + insights.get("scientific_disclaimer", "")
+            )
         timesteps = int(preds.shape[0])
         vertices = int(preds.shape[1])
         return insights, timesteps, vertices, len(segments), created_artifacts

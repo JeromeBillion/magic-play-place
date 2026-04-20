@@ -20,22 +20,26 @@ _otel_tracer: Any | None = None
 _METRIC_HISTOGRAM_BOUNDS = (0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 30.0)
 _metrics_predict_runtime = {
     "buckets": [0 for _ in _METRIC_HISTOGRAM_BOUNDS],
+    "overflow_count": 0,
     "count": 0,
     "sum": 0.0,
 }
 _metrics_generate_runtime = {
     "buckets": [0 for _ in _METRIC_HISTOGRAM_BOUNDS],
+    "overflow_count": 0,
     "count": 0,
     "sum": 0.0,
 }
 _metrics_async_runtime = {
     "predict": {
         "buckets": [0 for _ in _METRIC_HISTOGRAM_BOUNDS],
+        "overflow_count": 0,
         "count": 0,
         "sum": 0.0,
     },
     "generate": {
         "buckets": [0 for _ in _METRIC_HISTOGRAM_BOUNDS],
+        "overflow_count": 0,
         "count": 0,
         "sum": 0.0,
     },
@@ -112,6 +116,7 @@ def _observe_histogram(histogram: dict[str, Any], value_seconds: float) -> None:
         if bounded_value <= bound:
             histogram["buckets"][index] += 1
             return
+    histogram["overflow_count"] += 1
 
 
 def _increment_job_counter(counter: dict[str, int], job_type: str) -> None:

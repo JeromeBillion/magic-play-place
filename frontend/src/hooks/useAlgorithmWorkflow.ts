@@ -20,6 +20,15 @@ function normalizeGenerationMode(value: unknown): GenerationMode {
   return 'unknown';
 }
 
+function normalizeInferenceMode(value: unknown): InferenceMode {
+  if (value === 'mock' || value === 'tribe') return value;
+  return 'unknown';
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : null;
+}
+
 export function useAlgorithmWorkflow(
   refreshHealth: () => Promise<void>,
   setLastRequestId: (id: string) => void,
@@ -69,6 +78,18 @@ export function useAlgorithmWorkflow(
     arousal: number;
     modality: Modality;
   }) => {
+    if (mode === 'conditioning') {
+      setLastBackendError('none');
+      setAnalysis(`Conditioning profile applied.\nNeurological profile: ${profile.toUpperCase()}\nAge cohort: ${cohort.toUpperCase()}`);
+      setRemarks('Future discovery and therapeutics runs will be evaluated under the updated demographic substrate.');
+      setFindings((prev) => [
+        'CONDITIONING baseline updated',
+        `Active cohort: ${profile}/${cohort}`,
+        ...prev.slice(0, 3),
+      ]);
+      return;
+    }
+
     let progressInterval: ReturnType<typeof setInterval> | null = null;
     setIsProcessing(true);
     setProgress(2);
@@ -97,17 +118,24 @@ export function useAlgorithmWorkflow(
         }
 
         const { data, requestId } = await submitPredict(formData);
-        
+        const insights = asRecord(data?.insights);
         setLastRequestId(requestId);
-        const description = data?.insights?.description ?? data?.message ?? 'Prediction complete.';
+        const description =
+          (typeof insights?.description === 'string' ? insights.description : null) ??
+          (typeof data?.message === 'string' ? data.message : null) ??
+          'Prediction complete.';
         const crossModal =
-          data?.insights?.cross_modal_guide ?? 'No cross-modal recommendation was returned by the backend.';
+          (typeof insights?.cross_modal_guide === 'string' ? insights.cross_modal_guide : null) ??
+          'No cross-modal recommendation was returned by the backend.';
         const evidenceTags = Array.isArray(data?.evidence_tags) ? data.evidence_tags.join(', ') : 'n/a';
-        const disclaimer = data?.scientific_disclaimer ?? 'Research-use output only. Not clinical advice.';
+        const disclaimer =
+          typeof data?.scientific_disclaimer === 'string'
+            ? data.scientific_disclaimer
+            : 'Research-use output only. Not clinical advice.';
 
         setAnalysis(description);
         setRemarks(`${crossModal}\n\nDisclaimer: ${disclaimer}`);
-        setLastInferenceMode(data?.inference_mode);
+        setLastInferenceMode(normalizeInferenceMode(data?.inference_mode));
         setLastBackendError('none');
         setFindings((prev) => [
           `DISCOVERY completed (${stimulusType.toUpperCase()})`,
@@ -127,39 +155,38 @@ export function useAlgorithmWorkflow(
         const { data, requestId } = await submitGenerate(payloadData);
         setLastRequestId(requestId);
 
-        const metrics = data?.optimization_metrics;
+        const metrics = asRecord(data?.optimization_metrics) ?? asRecord(data?.simulated_optimization_metrics);
+        const generationMode =
+          typeof data?.generation_mode === 'string' ? data.generation_mode : 'simulation';
+        const iterations = typeof data?.iterations === 'number' ? data.iterations : 'n/a';
+        const generatedPayload =
+          typeof data?.generated_payload === 'string' ? data.generated_payload : 'n/a';
+        const validationReference =
+          typeof data?.validation_reference === 'string' ? data.validation_reference : null;
+        const scientificDisclaimer =
+          typeof data?.scientific_disclaimer === 'string'
+            ? data.scientific_disclaimer
+            : 'Simulation mode only.';
         const metricSummary =
           metrics && typeof metrics === 'object'
             ? `\nBaseline distance: ${metrics.baseline_distance ?? 'n/a'}\nFinal distance: ${
                 metrics.final_distance ?? 'n/a'
               }\nImprovement: ${metrics.improvement ?? 'n/a'}`
             : '';
-        const validationRef = data?.validation_reference ? `\nValidation ref: ${data.validation_reference}` : '';
+        const validationRef = validationReference ? `\nValidation ref: ${validationReference}` : '';
         
         setAnalysis(
-          `Therapeutics ${String(data?.generation_mode ?? 'simulation').toUpperCase()} complete.\nIterations: ${
-            data?.iterations ?? 'n/a'
-          }\nPayload: ${data?.generated_payload ?? 'n/a'}${metricSummary}${validationRef}`
+          `Therapeutics ${generationMode.toUpperCase()} complete.\nIterations: ${iterations}\nPayload: ${generatedPayload}${metricSummary}${validationRef}`
         );
         setRemarks(
-          `${data?.scientific_disclaimer ?? 'Simulation mode only.'}\n\nTarget baseline: ${profile.toUpperCase()} / ${cohort.toUpperCase()}.`
+          `${scientificDisclaimer}\n\nTarget baseline: ${profile.toUpperCase()} / ${cohort.toUpperCase()}.`
         );
-        setLastInferenceMode(data?.inference_mode);
+        setLastInferenceMode(normalizeInferenceMode(data?.inference_mode));
         setLastGenerationMode(normalizeGenerationMode(data?.generation_mode));
         setLastBackendError('none');
         setFindings((prev) => [
-          'THERAPEUTICS simulation completed',
+          `THERAPEUTICS ${generationMode.toUpperCase()} completed`,
           `Target vectors: valence=${valence}, arousal=${arousal}, modality=${modality}`,
-          ...prev.slice(0, 3),
-        ]);
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 900));
-        setAnalysis(`Conditioning profile applied.\nNeurological profile: ${profile.toUpperCase()}\nAge cohort: ${cohort.toUpperCase()}`);
-        setRemarks('Future discovery and therapeutics runs will be evaluated under the updated demographic substrate.');
-        setLastBackendError('none');
-        setFindings((prev) => [
-          'CONDITIONING baseline updated',
-          `Active cohort: ${profile}/${cohort}`,
           ...prev.slice(0, 3),
         ]);
       }

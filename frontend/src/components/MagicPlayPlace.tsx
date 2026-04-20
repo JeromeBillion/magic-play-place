@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Star } from 'lucide-react';
 import { Mode, NeurologicalProfile, AgeCohort, Modality, StimulusType } from '../lib/types';
-import { useBackendDiagnostics } from '../hooks/useBackendDiagnostics';
+import { buildErrorDiagnosticGuidance, useBackendDiagnostics } from '../hooks/useBackendDiagnostics';
 import { useAlgorithmWorkflow } from '../hooks/useAlgorithmWorkflow';
 import { ControlPanel } from './panels/ControlPanel';
 import { CenterStatusVisualizer } from './visualizer/CenterStatusVisualizer';
@@ -33,12 +33,11 @@ export default function MagicPlayPlace() {
     backendReachability,
     lastInferenceMode,
     lastRequestId,
-    diagnosticGuidance,
+    diagnosticGuidance: backendDiagnosticGuidance,
     refreshHealth,
     setLastRequestId,
     setLastInferenceMode,
-  } = useBackendDiagnostics(''); 
-  // We'll pass the correct last error in a moment via another hook's state.
+  } = useBackendDiagnostics();
 
   const {
     isProcessing,
@@ -53,12 +52,17 @@ export default function MagicPlayPlace() {
     handleRunAlgorithm,
   } = useAlgorithmWorkflow(refreshHealth, setLastRequestId, setLastInferenceMode);
 
-  // We actually need the useBackendDiagnostics hook to know about `lastBackendError`.
-  // Wait, in React, we just passed `''` to `useBackendDiagnostics`. Let's fix that.
-  // We can pass `lastBackendError` directly since it will trigger a re-computation of the diagnosticGuidance useMemo.
-  
-  // To avoid circular dependency in hooks, the simplest architecture is to recalculate guidance here
-  // But wait! `diagnosticGuidance` is fine since `lastBackendError` is available. Re-evaluating `useBackendDiagnostics()` below.
+  const diagnosticGuidance = useMemo(() => {
+    const combined = backendDiagnosticGuidance.filter(
+      (item) => item !== 'No active diagnostics warnings.'
+    );
+    for (const item of buildErrorDiagnosticGuidance(lastBackendError)) {
+      if (!combined.includes(item)) {
+        combined.push(item);
+      }
+    }
+    return combined.length > 0 ? combined : ['No active diagnostics warnings.'];
+  }, [backendDiagnosticGuidance, lastBackendError]);
   
   const handleExecute = () => {
     handleRunAlgorithm({
@@ -81,6 +85,9 @@ export default function MagicPlayPlace() {
           <div className="flex items-center gap-3">
             <Star className="w-6 h-6 text-emerald-500" fill="currentColor" />
             <h1 className="text-xl tracking-[0.2em] uppercase">Magic Play Place</h1>
+            <span className="ml-2 hidden sm:inline-block px-2 py-0.5 text-[10px] tracking-widest border border-emerald-500/30 text-emerald-500 bg-emerald-500/10 rounded uppercase">
+              {profile} • {cohort}
+            </span>
           </div>
           <nav className="flex gap-1 flex-wrap">
             {(['discovery', 'therapeutics', 'conditioning'] as Mode[]).map((m) => (
@@ -93,7 +100,7 @@ export default function MagicPlayPlace() {
                     : 'text-white/50 hover:text-white/80'
                 }`}
               >
-                {m}
+                {m === 'conditioning' ? 'Profile Config' : m}
               </button>
             ))}
           </nav>
@@ -142,7 +149,9 @@ export default function MagicPlayPlace() {
               />
               <span className="relative flex items-center justify-center gap-2">
                 <Play className="w-4 h-4" />
-                {mode === 'therapeutics'
+                {mode === 'conditioning'
+                  ? 'Apply Profile'
+                  : mode === 'therapeutics'
                   ? backendHealth?.generate_mode === 'model_loop'
                     ? 'Run Model Loop'
                     : 'Run Sim Loop'

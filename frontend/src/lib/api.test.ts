@@ -3,7 +3,7 @@ import { fetchHealth, submitGenerate, buildRequestHeaders } from "./api";
 
 // We keep global fetch in the environment, we just spy on it
 describe("api client", () => {
-  let fetchSpy: any;
+  let fetchSpy: jest.SpiedFunction<typeof fetch>;
 
   beforeEach(() => {
     fetchSpy = jest.spyOn(global, "fetch").mockImplementation(() =>
@@ -11,7 +11,7 @@ describe("api client", () => {
         ok: true,
         json: () => Promise.resolve({ success: true }),
         headers: new Headers({ "x-request-id": "mock-req-123" }),
-      } as any)
+      } as unknown as Response)
     );
   });
 
@@ -31,7 +31,7 @@ describe("api client", () => {
         ok: true,
         json: () => Promise.resolve({ inference_mode: "mock" }),
         headers: new Headers({ "x-request-id": "mock-req-777" }),
-      } as any)
+      } as unknown as Response)
     );
 
     const result = await fetchHealth();
@@ -46,7 +46,7 @@ describe("api client", () => {
         ok: true,
         json: () => Promise.resolve({ generation_mode: "simulation" }),
         headers: new Headers({ "x-request-id": "mock-req-888" }),
-      } as any)
+      } as unknown as Response)
     );
 
     const payload = { valence: 50, arousal: 50 };

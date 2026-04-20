@@ -4,7 +4,6 @@ import {
   BackendHealthResponse,
   BackendReachability,
   InferenceMode,
-  GenerationMode,
 } from '../lib/types';
 
 function normalizeInferenceMode(value: unknown): InferenceMode {
@@ -12,8 +11,32 @@ function normalizeInferenceMode(value: unknown): InferenceMode {
   return 'unknown';
 }
 
+export function buildErrorDiagnosticGuidance(lastBackendError: string): string[] {
+  const guidance: string[] = [];
+  if (lastBackendError.includes('MAX_UPLOAD_MB')) {
+    guidance.push('Upload rejected by file size limit. Reduce file size or raise MAX_UPLOAD_MB.');
+  }
+  if (lastBackendError.includes('MAX_TEXT_CHARS')) {
+    guidance.push('Text prompt exceeded configured max length. Reduce prompt or raise MAX_TEXT_CHARS.');
+  }
+  if (
+    lastBackendError.includes('Content-Type') ||
+    lastBackendError.includes('does not match extension') ||
+    lastBackendError.includes('Corrupted WAV file')
+  ) {
+    guidance.push('Media validation failed. Ensure file extension, MIME type, and binary format all match.');
+  }
+  if (lastBackendError.includes('API key required') || lastBackendError.includes('Invalid API key')) {
+    guidance.push('Backend auth rejected this request. Configure and send a valid API key.');
+  }
+  if (lastBackendError.includes('Rate limit exceeded')) {
+    guidance.push('Rate limit reached. Wait for the window reset or adjust backend rate policy.');
+  }
+  return guidance;
+}
 
-export function useBackendDiagnostics(lastBackendError: string) {
+
+export function useBackendDiagnostics() {
   const [backendReachability, setBackendReachability] = useState<BackendReachability>('checking');
   const [backendHealth, setBackendHealth] = useState<BackendHealthResponse | null>(null);
   const [lastInferenceMode, setLastInferenceMode] = useState<InferenceMode>('unknown');
@@ -84,25 +107,6 @@ export function useBackendDiagnostics(lastBackendError: string) {
     if (backendHealth?.tribe_model_status?.startsWith('error:')) {
       guidance.push(`Tribe model failed to load: ${backendHealth.tribe_model_status}`);
     }
-    if (lastBackendError.includes('MAX_UPLOAD_MB')) {
-      guidance.push('Upload rejected by file size limit. Reduce file size or raise MAX_UPLOAD_MB.');
-    }
-    if (lastBackendError.includes('MAX_TEXT_CHARS')) {
-      guidance.push('Text prompt exceeded configured max length. Reduce prompt or raise MAX_TEXT_CHARS.');
-    }
-    if (
-      lastBackendError.includes('Content-Type') ||
-      lastBackendError.includes('does not match extension') ||
-      lastBackendError.includes('Corrupted WAV file')
-    ) {
-      guidance.push('Media validation failed. Ensure file extension, MIME type, and binary format all match.');
-    }
-    if (lastBackendError.includes('API key required') || lastBackendError.includes('Invalid API key')) {
-      guidance.push('Backend auth rejected this request. Configure and send a valid API key.');
-    }
-    if (lastBackendError.includes('Rate limit exceeded')) {
-      guidance.push('Rate limit reached. Wait for the window reset or adjust backend rate policy.');
-    }
     if (backendHealth?.metrics_enabled === false) {
       guidance.push('Metrics endpoint is disabled. Enable METRICS_ENABLED for runtime observability.');
     }
@@ -111,7 +115,7 @@ export function useBackendDiagnostics(lastBackendError: string) {
       guidance.push('No active diagnostics warnings.');
     }
     return guidance;
-  }, [backendReachability, backendHealth, lastBackendError]);
+  }, [backendReachability, backendHealth]);
 
   return {
     backendHealth,

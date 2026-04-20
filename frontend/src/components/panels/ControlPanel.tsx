@@ -13,7 +13,7 @@ type ControlPanelProps = {
   mediaFile: File | null;
   setMediaFile: (f: File | null) => void;
   openFilePicker: () => void;
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
   valence: number;
   setValence: (v: number) => void;
   arousal: number;
@@ -160,8 +160,8 @@ export function ControlPanel({
             <label className="text-xs tracking-wide uppercase text-white/60 block mb-3">
               Output Modality
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {(['audio', 'text', 'image'] as Modality[]).map((m) => (
+            <div className="grid grid-cols-2 gap-2">
+              {(['audio', 'text', 'image', 'video'] as Modality[]).map((m) => (
                 <button
                   key={m}
                   onClick={() => setModality(m)}

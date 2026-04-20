@@ -1,7 +1,7 @@
 export type Mode = 'discovery' | 'therapeutics' | 'conditioning';
 export type NeurologicalProfile = 'neurotypical' | 'adhd' | 'asd';
 export type AgeCohort = 'youth' | 'adult' | 'elderly';
-export type Modality = 'audio' | 'text' | 'image';
+export type Modality = 'audio' | 'text' | 'image' | 'video';
 export type StimulusType = 'text' | 'image' | 'video' | 'audio';
 export type InferenceMode = 'mock' | 'tribe' | 'unknown';
 export type GenerationMode = 'simulation' | 'model_loop' | 'unknown';

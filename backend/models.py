@@ -11,8 +11,9 @@ class PredictResponse(BaseModel):
     timesteps: int | None = None
     vertices: int | None = None
     inference_mode: str
-    evidence_tags: list[Literal["observed", "inferred", "hypothesis"]] = []
+    evidence_tags: list[Literal["observed", "inferred", "hypothesis", "low_confidence"]] = []
     scientific_disclaimer: str
+    mock_data: bool | None = None
 
 class TargetStateRequest(BaseModel):
     valence: int = Field(ge=0, le=100)
@@ -31,6 +32,8 @@ class GenerateResponse(BaseModel):
     validation_reference: str | None = None
     signoff_reference: str | None = None
     optimization_metrics: dict[str, int | float] | None = None
+    simulated_optimization_metrics: dict[str, int | float] | None = None
+    loop_type: Literal["simulation", "model_evaluated"]
 
 class JobSubmitResponse(BaseModel):
     status: Literal["accepted"] = "accepted"

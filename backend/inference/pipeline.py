@@ -21,6 +21,7 @@ from config import (
 from conversion import convert_image_to_video
 from inference.mock import run_mock_inference
 from inference.tribe import run_tribe_inference
+from llm_analyst import validate_evidence_tags
 from media import (
     cleanup_request_artifacts,
     get_stimulus_type_from_extension,
@@ -153,15 +154,14 @@ async def execute_predict_pipeline(
             source_hint = str(inference_path) if inference_path else "text_prompt"
             message = f"Processed {stimulus_type} stimulus from {source_hint} in mock mode."
 
-        evidence_tags = insights.get("evidence_tags", ["inferred", "hypothesis"])
-        if not isinstance(evidence_tags, list):
-            evidence_tags = ["inferred", "hypothesis"]
-        evidence_tags = [
-            tag
-            for tag in evidence_tags
-            if tag in {"observed", "inferred", "hypothesis"}
-        ]
-        if not evidence_tags:
+        evidence_tags_raw = insights.get("evidence_tags", ["inferred", "hypothesis"])
+        if not isinstance(evidence_tags_raw, list):
+            evidence_tags_raw = ["inferred", "hypothesis"]
+        try:
+            evidence_tags = validate_evidence_tags(
+                [tag.value if hasattr(tag, "value") else str(tag) for tag in evidence_tags_raw]
+            )
+        except ValueError:
             evidence_tags = ["inferred", "hypothesis"]
 
         scientific_disclaimer = insights.get(
@@ -178,6 +178,7 @@ async def execute_predict_pipeline(
             inference_mode=INFERENCE_MODE,
             evidence_tags=evidence_tags,  # type: ignore[arg-type]
             scientific_disclaimer=str(scientific_disclaimer),
+            mock_data=insights.get("mock_data", False),
         )
     finally:
         record_predict_runtime(time.perf_counter() - start_time)
@@ -271,25 +272,30 @@ async def execute_generate_pipeline(req: TargetStateRequest) -> GenerateResponse
                 generated_payload=payload,
                 inference_mode=INFERENCE_MODE,
                 generation_mode="model_loop",
+                loop_type="model_evaluated",
                 scientific_disclaimer=scientific_disclaimer,
                 validation_reference=GENERATE_MODEL_LOOP_VALIDATION_REPORT,
                 signoff_reference=GENERATE_MODEL_LOOP_SIGNOFF_REPORT,
                 optimization_metrics=optimization_metrics,
+                simulated_optimization_metrics=None,
             )
 
         await asyncio.sleep(GENERATE_SIMULATION_DELAY_SECONDS)
+        simulation_summary = run_model_loop_search(req)
         return GenerateResponse(
             iterations=50,
             generated_payload=f"[SYNTHETIC_{req.modality.upper()}_FILE_{req.valence}v_{req.arousal}a.raw]",
             inference_mode=INFERENCE_MODE,
             generation_mode="simulation",
+            loop_type="simulation",
             scientific_disclaimer=(
-                "Simulation mode only. Therapeutic generation is not yet model-loop validated "
-                "and must not be used as a clinical intervention."
+                "SIMULATION MODE — This optimization was simulated via gradient approximation. No model was queried during generation. "
+                "Therapeutic generation is not yet model-loop validated and must not be used as a clinical intervention."
             ),
             validation_reference=None,
             signoff_reference=None,
             optimization_metrics=None,
+            simulated_optimization_metrics=simulation_summary,
         )
     finally:
         record_generate_runtime(time.perf_counter() - start_time)

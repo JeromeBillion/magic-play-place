@@ -79,12 +79,15 @@ class MockModeApiTests(unittest.TestCase):
         payload = response.json()
         self.assertEqual(payload["inference_mode"], "mock")
         self.assertEqual(payload["stimulus_type"], "TEXT")
-        self.assertEqual(payload["timesteps"], 1)
+        self.assertGreaterEqual(payload["timesteps"], 1)
+        self.assertLessEqual(payload["timesteps"], 8)
         self.assertEqual(payload["vertices"], 20484)
         self.assertIn("description", payload["insights"])
         self.assertIn("cross_modal_guide", payload["insights"])
         self.assertIn("evidence_tags", payload)
         self.assertGreaterEqual(len(payload["evidence_tags"]), 1)
+        self.assertIn("low_confidence", payload["evidence_tags"])
+        self.assertTrue(payload["mock_data"])
         self.assertIn("scientific_disclaimer", payload)
 
     def test_predict_text_too_long(self):
@@ -159,10 +162,12 @@ class MockModeApiTests(unittest.TestCase):
         self.assertEqual(payload["iterations"], 50)
         self.assertEqual(payload["inference_mode"], "mock")
         self.assertEqual(payload["generation_mode"], "simulation")
-        self.assertIn("Simulation mode only", payload["scientific_disclaimer"])
+        self.assertEqual(payload["loop_type"], "simulation")
+        self.assertIn("SIMULATION MODE", payload["scientific_disclaimer"])
         self.assertIn("SYNTHETIC_AUDIO_FILE_60v_40a.raw", payload["generated_payload"])
         self.assertIsNone(payload["validation_reference"])
         self.assertIsNone(payload["optimization_metrics"])
+        self.assertIsInstance(payload["simulated_optimization_metrics"], dict)
         sleep_mock.assert_awaited_once()
 
 
