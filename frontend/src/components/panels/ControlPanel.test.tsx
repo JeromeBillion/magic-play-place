@@ -61,7 +61,10 @@ describe("ControlPanel", () => {
       />
     );
 
-    expect(screen.getByText(/Valence: 75/i)).toBeInTheDocument();
-    expect(screen.getByText(/Arousal: 35/i)).toBeInTheDocument();
+    // Label and value are now separate elements
+    expect(screen.getByText("Valence")).toBeInTheDocument();
+    expect(screen.getByText("75%")).toBeInTheDocument();
+    expect(screen.getByText("Arousal")).toBeInTheDocument();
+    expect(screen.getByText("35%")).toBeInTheDocument();
   });
 });

@@ -77,7 +77,7 @@ export function useBackendDiagnostics() {
     };
   }, [refreshHealth]);
 
-  const diagnosticGuidance = useMemo(() => {
+  const buildGuidance = useCallback((lastBackendError: string) => {
     const guidance: string[] = [];
 
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
@@ -111,11 +111,18 @@ export function useBackendDiagnostics() {
       guidance.push('Metrics endpoint is disabled. Enable METRICS_ENABLED for runtime observability.');
     }
 
+    // Merge in error-specific guidance
+    const errorGuidance = buildErrorDiagnosticGuidance(lastBackendError);
+    guidance.push(...errorGuidance);
+
     if (guidance.length === 0) {
-      guidance.push('No active diagnostics warnings.');
+      guidance.push('All systems nominal.');
     }
     return guidance;
   }, [backendReachability, backendHealth]);
+
+  // Keep legacy `diagnosticGuidance` for backward compatibility  
+  const diagnosticGuidance = useMemo(() => buildGuidance('none'), [buildGuidance]);
 
   return {
     backendHealth,
@@ -123,6 +130,7 @@ export function useBackendDiagnostics() {
     lastInferenceMode,
     lastRequestId,
     diagnosticGuidance,
+    buildGuidance,
     refreshHealth,
     setLastRequestId,
     setLastInferenceMode,

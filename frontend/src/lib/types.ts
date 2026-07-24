@@ -38,3 +38,25 @@ export type BackendHealthResponse = {
   job_queue_max_pending?: number;
   job_queue_depth?: number;
 };
+
+/** A single run result stored in session history (UX5). */
+export type RunResult = {
+  id: string;
+  timestamp: string;
+  mode: Mode;
+  analysis: string;
+  remarks: string;
+  findings: string[];
+  inferenceMode: InferenceMode;
+  generationMode: GenerationMode;
+  isMock: boolean;
+  evidenceTags: string[];
+  params: {
+    profile: NeurologicalProfile;
+    cohort: AgeCohort;
+    stimulusType?: StimulusType;
+    valence?: number;
+    arousal?: number;
+    modality?: Modality;
+  };
+};

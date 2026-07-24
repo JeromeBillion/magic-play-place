@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { submitPredict, submitGenerate } from '../lib/api';
 import {
   Mode,
@@ -8,6 +8,7 @@ import {
   NeurologicalProfile,
   AgeCohort,
   InferenceMode,
+  RunResult,
 } from '../lib/types';
 
 function mapAgeCohort(cohort: AgeCohort): 'child' | 'adult' | 'elderly' {
@@ -29,13 +30,14 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : null;
 }
 
+const MAX_HISTORY = 8;
+
 export function useAlgorithmWorkflow(
   refreshHealth: () => Promise<void>,
   setLastRequestId: (id: string) => void,
   setLastInferenceMode: (mode: InferenceMode) => void
 ) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [analysis, setAnalysis] = useState(
     'Configure inputs, then run the algorithm to generate neural response analysis.'
   );
@@ -47,6 +49,9 @@ export function useAlgorithmWorkflow(
   ]);
   const [lastGenerationMode, setLastGenerationMode] = useState<GenerationMode>('unknown');
   const [lastBackendError, setLastBackendError] = useState<string>('none');
+  const [isMockResult, setIsMockResult] = useState(false);
+  const [evidenceTags, setEvidenceTags] = useState<string[]>([]);
+  const [runHistory, setRunHistory] = useState<RunResult[]>([]);
 
   const sessionId = useMemo(
     () => `NRL-${Math.random().toString(36).slice(2, 11).toUpperCase()}`,
@@ -56,6 +61,20 @@ export function useAlgorithmWorkflow(
     () => new Date().toISOString().split('.')[0],
     []
   );
+
+  const addToHistory = useCallback((result: RunResult) => {
+    setRunHistory((prev) => [result, ...prev].slice(0, MAX_HISTORY));
+  }, []);
+
+  const exportHistory = useCallback(() => {
+    const blob = new Blob([JSON.stringify(runHistory, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mpp-session-${sessionId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [runHistory, sessionId]);
 
   const handleRunAlgorithm = async ({
     mode,
@@ -78,27 +97,47 @@ export function useAlgorithmWorkflow(
     arousal: number;
     modality: Modality;
   }) => {
+    // UX6: Conditioning is instant — no fake processing
     if (mode === 'conditioning') {
-      setLastBackendError('none');
-      setAnalysis(`Conditioning profile applied.\nNeurological profile: ${profile.toUpperCase()}\nAge cohort: ${cohort.toUpperCase()}`);
-      setRemarks('Future discovery and therapeutics runs will be evaluated under the updated demographic substrate.');
-      setFindings((prev) => [
+      const condAnalysis = `Conditioning profile applied.\nNeurological profile: ${profile.toUpperCase()}\nAge cohort: ${cohort.toUpperCase()}`;
+      const condRemarks = 'Future discovery and therapeutics runs will be evaluated under the updated demographic substrate.';
+      const condFindings = [
         'CONDITIONING baseline updated',
         `Active cohort: ${profile}/${cohort}`,
-        ...prev.slice(0, 3),
-      ]);
+      ];
+      setLastBackendError('none');
+      setAnalysis(condAnalysis);
+      setRemarks(condRemarks);
+      setIsMockResult(false);
+      setEvidenceTags([]);
+      setFindings((prev) => [...condFindings, ...prev.slice(0, 3)]);
+      addToHistory({
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        mode,
+        analysis: condAnalysis,
+        remarks: condRemarks,
+        findings: condFindings,
+        inferenceMode: 'unknown',
+        generationMode: 'unknown',
+        isMock: false,
+        evidenceTags: [],
+        params: { profile, cohort },
+      });
       return;
     }
 
-    let progressInterval: ReturnType<typeof setInterval> | null = null;
     setIsProcessing(true);
-    setProgress(2);
-
-    progressInterval = setInterval(() => {
-      setProgress((prev) => (prev >= 95 ? 95 : prev + 3));
-    }, 150);
 
     try {
+      let resultAnalysis = '';
+      let resultRemarks = '';
+      let resultFindings: string[] = [];
+      let resultInferenceMode: InferenceMode = 'unknown';
+      let resultGenerationMode: GenerationMode = 'unknown';
+      let resultIsMock = false;
+      let resultTags: string[] = [];
+
       if (mode === 'discovery') {
         if (stimulusType === 'text' && !textInput.trim()) {
           throw new Error('Please enter text input before running discovery mode.');
@@ -127,22 +166,31 @@ export function useAlgorithmWorkflow(
         const crossModal =
           (typeof insights?.cross_modal_guide === 'string' ? insights.cross_modal_guide : null) ??
           'No cross-modal recommendation was returned by the backend.';
-        const evidenceTags = Array.isArray(data?.evidence_tags) ? data.evidence_tags.join(', ') : 'n/a';
+        const tags = Array.isArray(data?.evidence_tags) ? data.evidence_tags.map(String) : [];
         const disclaimer =
           typeof data?.scientific_disclaimer === 'string'
             ? data.scientific_disclaimer
             : 'Research-use output only. Not clinical advice.';
+        const mockFlag = data?.mock_data === true || (typeof insights?.mock_data === 'boolean' && insights.mock_data);
 
-        setAnalysis(description);
-        setRemarks(`${crossModal}\n\nDisclaimer: ${disclaimer}`);
-        setLastInferenceMode(normalizeInferenceMode(data?.inference_mode));
-        setLastBackendError('none');
-        setFindings((prev) => [
+        resultAnalysis = description;
+        resultRemarks = `${crossModal}\n\nDisclaimer: ${disclaimer}`;
+        resultInferenceMode = normalizeInferenceMode(data?.inference_mode);
+        resultIsMock = !!mockFlag;
+        resultTags = tags;
+        resultFindings = [
           `DISCOVERY completed (${stimulusType.toUpperCase()})`,
-          `Output shape: ${data?.timesteps ?? 'n/a'} timesteps x ${data?.vertices ?? 'n/a'} vertices`,
-          `Evidence tags: ${evidenceTags}`,
-          ...prev.slice(0, 3),
-        ]);
+          `Output shape: ${data?.timesteps ?? 'n/a'} timesteps × ${data?.vertices ?? 'n/a'} vertices`,
+          `Evidence tags: ${tags.length > 0 ? tags.join(', ') : 'n/a'}`,
+        ];
+
+        setAnalysis(resultAnalysis);
+        setRemarks(resultRemarks);
+        setLastInferenceMode(resultInferenceMode);
+        setIsMockResult(resultIsMock);
+        setEvidenceTags(resultTags);
+        setLastBackendError('none');
+        setFindings((prev) => [...resultFindings, ...prev.slice(0, 3)]);
       } else if (mode === 'therapeutics') {
         const payloadData = {
           valence,
@@ -167,6 +215,7 @@ export function useAlgorithmWorkflow(
           typeof data?.scientific_disclaimer === 'string'
             ? data.scientific_disclaimer
             : 'Simulation mode only.';
+        const loopType = typeof data?.loop_type === 'string' ? data.loop_type : 'simulation';
         const metricSummary =
           metrics && typeof metrics === 'object'
             ? `\nBaseline distance: ${metrics.baseline_distance ?? 'n/a'}\nFinal distance: ${
@@ -175,21 +224,48 @@ export function useAlgorithmWorkflow(
             : '';
         const validationRef = validationReference ? `\nValidation ref: ${validationReference}` : '';
         
-        setAnalysis(
-          `Therapeutics ${generationMode.toUpperCase()} complete.\nIterations: ${iterations}\nPayload: ${generatedPayload}${metricSummary}${validationRef}`
-        );
-        setRemarks(
-          `${scientificDisclaimer}\n\nTarget baseline: ${profile.toUpperCase()} / ${cohort.toUpperCase()}.`
-        );
-        setLastInferenceMode(normalizeInferenceMode(data?.inference_mode));
-        setLastGenerationMode(normalizeGenerationMode(data?.generation_mode));
-        setLastBackendError('none');
-        setFindings((prev) => [
+        resultAnalysis = `Therapeutics ${generationMode.toUpperCase()} complete.\nIterations: ${iterations}\nPayload: ${generatedPayload}${metricSummary}${validationRef}`;
+        resultRemarks = `${scientificDisclaimer}\n\nTarget baseline: ${profile.toUpperCase()} / ${cohort.toUpperCase()}.`;
+        resultInferenceMode = normalizeInferenceMode(data?.inference_mode);
+        resultGenerationMode = normalizeGenerationMode(data?.generation_mode);
+        resultIsMock = loopType === 'simulation';
+        resultTags = [];
+        resultFindings = [
           `THERAPEUTICS ${generationMode.toUpperCase()} completed`,
           `Target vectors: valence=${valence}, arousal=${arousal}, modality=${modality}`,
-          ...prev.slice(0, 3),
-        ]);
+        ];
+
+        setAnalysis(resultAnalysis);
+        setRemarks(resultRemarks);
+        setLastInferenceMode(resultInferenceMode);
+        setLastGenerationMode(resultGenerationMode);
+        setIsMockResult(resultIsMock);
+        setEvidenceTags(resultTags);
+        setLastBackendError('none');
+        setFindings((prev) => [...resultFindings, ...prev.slice(0, 3)]);
       }
+
+      // Add to history
+      addToHistory({
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        mode,
+        analysis: resultAnalysis,
+        remarks: resultRemarks,
+        findings: resultFindings,
+        inferenceMode: resultInferenceMode,
+        generationMode: resultGenerationMode,
+        isMock: resultIsMock,
+        evidenceTags: resultTags,
+        params: {
+          profile,
+          cohort,
+          stimulusType: mode === 'discovery' ? stimulusType : undefined,
+          valence: mode === 'therapeutics' ? valence : undefined,
+          arousal: mode === 'therapeutics' ? arousal : undefined,
+          modality: mode === 'therapeutics' ? modality : undefined,
+        },
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unexpected error occurred.';
       const requestMatch = message.match(/\[([a-f0-9]{12})\]/i);
@@ -201,8 +277,6 @@ export function useAlgorithmWorkflow(
       setRemarks('Check backend availability (default: http://localhost:8000) and input validity.');
       setFindings((prev) => [`ERROR: ${message}`, ...prev.slice(0, 4)]);
     } finally {
-      if (progressInterval) clearInterval(progressInterval);
-      setProgress(100);
       setIsProcessing(false);
       await refreshHealth();
     }
@@ -210,14 +284,17 @@ export function useAlgorithmWorkflow(
 
   return {
     isProcessing,
-    progress,
     analysis,
     remarks,
     findings,
     lastGenerationMode,
     lastBackendError,
+    isMockResult,
+    evidenceTags,
+    runHistory,
     sessionId,
     sessionTimestamp,
     handleRunAlgorithm,
+    exportHistory,
   };
 }

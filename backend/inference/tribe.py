@@ -76,12 +76,11 @@ def load_tribe_model() -> Any:
 def get_tribe_model_status() -> str:
     if INFERENCE_MODE != "tribe":
         return "disabled"
-    if _tribe_model is not None:
-        return "loaded"
-    if _tribe_model_error is not None:
-        return f"error: {_tribe_model_error}"
-    if _tribe_lock.locked():
-        return "loading"
+    with _tribe_lock:
+        if _tribe_model is not None:
+            return "loaded"
+        if _tribe_model_error is not None:
+            return f"error: {_tribe_model_error}"
     return "not_loaded"
 
 

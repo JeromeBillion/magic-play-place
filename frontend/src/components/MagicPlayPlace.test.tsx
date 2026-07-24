@@ -9,12 +9,12 @@ describe("MagicPlayPlace", () => {
     render(<MagicPlayPlace />);
 
     expect(screen.getByText("Magic Play Place")).toBeInTheDocument();
-    const therapeuticsButton = screen.getByRole("button", {
+    const therapeuticsTab = screen.getByRole("tab", {
       name: /therapeutics/i,
     });
 
-    await userEvent.click(therapeuticsButton);
+    await userEvent.click(therapeuticsTab);
 
-    expect(therapeuticsButton).toHaveClass("text-emerald-500");
+    expect(therapeuticsTab).toHaveAttribute("aria-selected", "true");
   });
 });

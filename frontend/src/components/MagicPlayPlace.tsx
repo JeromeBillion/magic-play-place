@@ -1,16 +1,19 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Star } from 'lucide-react';
-import { Mode, NeurologicalProfile, AgeCohort, Modality, StimulusType } from '../lib/types';
-import { buildErrorDiagnosticGuidance, useBackendDiagnostics } from '../hooks/useBackendDiagnostics';
+import { Play, Sparkles } from 'lucide-react';
+
+import { useBackendDiagnostics } from '../hooks/useBackendDiagnostics';
 import { useAlgorithmWorkflow } from '../hooks/useAlgorithmWorkflow';
 import { ControlPanel } from './panels/ControlPanel';
-import { CenterStatusVisualizer } from './visualizer/CenterStatusVisualizer';
 import { OutputPanel } from './panels/OutputPanel';
+import { CenterStatusVisualizer } from './visualizer/CenterStatusVisualizer';
+
+import type { Mode, StimulusType, Modality, NeurologicalProfile, AgeCohort } from '../lib/types';
 
 export default function MagicPlayPlace() {
+  // ─── UI State ───
   const [mode, setMode] = useState<Mode>('discovery');
   const [profile, setProfile] = useState<NeurologicalProfile>('neurotypical');
   const [cohort, setCohort] = useState<AgeCohort>('adult');
@@ -20,52 +23,46 @@ export default function MagicPlayPlace() {
   const [stimulusType, setStimulusType] = useState<StimulusType>('text');
   const [textInput, setTextInput] = useState('');
   const [mediaFile, setMediaFile] = useState<File | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ─── Backend Diagnostics Hook ───
+  const {
+    backendHealth,
+    backendReachability,
+    lastInferenceMode,
+    lastRequestId,
+    refreshHealth,
+    setLastRequestId,
+    setLastInferenceMode,
+    buildGuidance,
+  } = useBackendDiagnostics();
+
+  // ─── Algorithm Workflow Hook ───
+  const {
+    isProcessing,
+    analysis,
+    remarks,
+    findings,
+    lastGenerationMode,
+    lastBackendError,
+    isMockResult,
+    evidenceTags,
+    runHistory,
+    sessionId,
+    sessionTimestamp,
+    handleRunAlgorithm,
+    exportHistory,
+  } = useAlgorithmWorkflow(refreshHealth, setLastRequestId, setLastInferenceMode);
+
+  const diagnosticGuidance = buildGuidance(lastBackendError);
 
   const openFilePicker = () => {
     if (stimulusType === 'text') return;
     fileInputRef.current?.click();
   };
 
-  const {
-    backendHealth,
-    backendReachability,
-    lastInferenceMode,
-    lastRequestId,
-    diagnosticGuidance: backendDiagnosticGuidance,
-    refreshHealth,
-    setLastRequestId,
-    setLastInferenceMode,
-  } = useBackendDiagnostics();
-
-  const {
-    isProcessing,
-    progress,
-    analysis,
-    remarks,
-    findings,
-    lastGenerationMode,
-    lastBackendError,
-    sessionId,
-    sessionTimestamp,
-    handleRunAlgorithm,
-  } = useAlgorithmWorkflow(refreshHealth, setLastRequestId, setLastInferenceMode);
-
-  const diagnosticGuidance = useMemo(() => {
-    const combined = backendDiagnosticGuidance.filter(
-      (item) => item !== 'No active diagnostics warnings.'
-    );
-    for (const item of buildErrorDiagnosticGuidance(lastBackendError)) {
-      if (!combined.includes(item)) {
-        combined.push(item);
-      }
-    }
-    return combined.length > 0 ? combined : ['No active diagnostics warnings.'];
-  }, [backendDiagnosticGuidance, lastBackendError]);
-  
-  const handleExecute = () => {
-    handleRunAlgorithm({
+  const onRun = () => {
+    void handleRunAlgorithm({
       mode,
       profile,
       cohort,
@@ -78,39 +75,52 @@ export default function MagicPlayPlace() {
     });
   };
 
+  const getRunLabel = () => {
+    if (mode === 'conditioning') return 'Apply Profile';
+    if (mode === 'therapeutics') {
+      return backendHealth?.generate_mode === 'model_loop' ? 'Run Model Loop' : 'Run Simulation';
+    }
+    return 'Run Discovery';
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white font-mono overflow-x-hidden">
-      <header className="border-b border-white/10 backdrop-blur-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-8 py-4">
+    <div className="min-h-screen mesh-bg text-white overflow-x-hidden">
+      {/* ─── Header ─── */}
+      <header className="glass-panel border-t-0 border-x-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-8 py-3">
           <div className="flex items-center gap-3">
-            <Star className="w-6 h-6 text-emerald-500" fill="currentColor" />
-            <h1 className="text-xl tracking-[0.2em] uppercase">Magic Play Place</h1>
-            <span className="ml-2 hidden sm:inline-block px-2 py-0.5 text-[10px] tracking-widest border border-emerald-500/30 text-emerald-500 bg-emerald-500/10 rounded uppercase">
-              {profile} • {cohort}
+            <Sparkles className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+            <h1 className="text-base font-semibold tracking-[0.25em] uppercase">
+              Magic Play Place
+            </h1>
+            <span className="text-[9px] tracking-widest text-white/25 uppercase hidden sm:inline">
+              Neuro-AI Lab
             </span>
           </div>
-          <nav className="flex gap-1 flex-wrap">
+          <nav className="flex gap-0.5" role="tablist" aria-label="Mode navigation">
             {(['discovery', 'therapeutics', 'conditioning'] as Mode[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`px-6 py-2 uppercase text-xs tracking-[0.15em] transition-all ${
-                  mode === m
-                    ? 'text-emerald-500 border-b-2 border-emerald-500'
-                    : 'text-white/50 hover:text-white/80'
-                }`}
+                role="tab"
+                aria-selected={mode === m}
+                aria-label={`Switch to ${m} mode`}
+                data-mode={m}
+                className={`mode-btn ${mode === m ? 'active' : ''}`}
               >
-                {m === 'conditioning' ? 'Profile Config' : m}
+                {m}
               </button>
             ))}
           </nav>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr_320px] gap-0 xl:h-[calc(100vh-73px)]">
-        <div className="border-b xl:border-b-0 xl:border-r border-white/10 p-4 sm:p-6 overflow-y-auto">
+      {/* ─── Main Grid ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr_360px] gap-0 lg:h-[calc(100vh-57px)]">
+        {/* ─── Left: Controls ─── */}
+        <div className="border-b lg:border-b-0 lg:border-r border-white/[0.06] p-5 sm:p-6 overflow-y-auto">
           <div className="space-y-6">
-            <div className="text-xs tracking-[0.15em] uppercase text-emerald-500 mb-6">Control Panel</div>
+            <div className="section-label accent">Control Panel</div>
 
             <ControlPanel
               mode={mode}
@@ -134,38 +144,42 @@ export default function MagicPlayPlace() {
               setCohort={setCohort}
             />
 
+            {/* Active Profile Badge */}
+            <div className="flex items-center gap-2 text-[10px] text-white/30 uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
+              {profile} / {cohort}
+            </div>
+
+            {/* Run Button */}
             <motion.button
-              onClick={handleExecute}
+              onClick={onRun}
               disabled={isProcessing}
-              className="w-full py-4 bg-emerald-500 text-black uppercase tracking-[0.2em] text-sm font-bold relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed group"
-              whileHover={{ scale: isProcessing ? 1 : 1.02 }}
-              whileTap={{ scale: isProcessing ? 1 : 0.98 }}
+              className="run-btn"
+              whileHover={{ scale: isProcessing ? 1 : 1.015 }}
+              whileTap={{ scale: isProcessing ? 1 : 0.985 }}
+              aria-label={getRunLabel()}
+              id="run-algorithm-btn"
             >
-              <motion.div
-                className="absolute inset-0 bg-emerald-400"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: 0 }}
-                transition={{ duration: 0.3 }}
-              />
               <span className="relative flex items-center justify-center gap-2">
                 <Play className="w-4 h-4" />
-                {mode === 'conditioning'
-                  ? 'Apply Profile'
-                  : mode === 'therapeutics'
-                  ? backendHealth?.generate_mode === 'model_loop'
-                    ? 'Run Model Loop'
-                    : 'Run Sim Loop'
-                  : 'Run Algorithm'}
+                {getRunLabel()}
               </span>
             </motion.button>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center p-4 sm:p-8 xl:p-12 relative border-b xl:border-b-0 border-white/10">
-          <CenterStatusVisualizer profile={profile} isProcessing={isProcessing} progress={progress} />
+        {/* ─── Center: Visualizer ─── */}
+        <div className="flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative border-b lg:border-b-0 border-white/[0.06]">
+          <CenterStatusVisualizer
+            profile={profile}
+            isProcessing={isProcessing}
+            mode={mode}
+            backendReachability={backendReachability}
+          />
         </div>
 
-        <div className="xl:border-l border-white/10 p-4 sm:p-6 overflow-y-auto">
+        {/* ─── Right: Output ─── */}
+        <div className="lg:border-l border-white/[0.06] p-4 sm:p-5 overflow-y-auto">
           <OutputPanel
             analysis={analysis}
             findings={findings}
@@ -179,7 +193,11 @@ export default function MagicPlayPlace() {
             backendHealth={backendHealth}
             lastRequestId={lastRequestId}
             diagnosticGuidance={diagnosticGuidance}
-            refreshHealth={refreshHealth}
+            refreshHealth={() => void refreshHealth()}
+            isMockResult={isMockResult}
+            evidenceTags={evidenceTags}
+            runHistory={runHistory}
+            exportHistory={exportHistory}
           />
         </div>
       </div>

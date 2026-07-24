@@ -209,17 +209,20 @@ def build_prometheus_metrics_payload() -> str:
     with _metrics_lock:
         predict_runtime = {
             "buckets": list(_metrics_predict_runtime["buckets"]),
+            "overflow_count": int(_metrics_predict_runtime["overflow_count"]),
             "count": int(_metrics_predict_runtime["count"]),
             "sum": float(_metrics_predict_runtime["sum"]),
         }
         generate_runtime = {
             "buckets": list(_metrics_generate_runtime["buckets"]),
+            "overflow_count": int(_metrics_generate_runtime["overflow_count"]),
             "count": int(_metrics_generate_runtime["count"]),
             "sum": float(_metrics_generate_runtime["sum"]),
         }
         async_runtime = {
             job_type: {
                 "buckets": list(hist["buckets"]),
+                "overflow_count": int(hist["overflow_count"]),
                 "count": int(hist["count"]),
                 "sum": float(hist["sum"]),
             }
