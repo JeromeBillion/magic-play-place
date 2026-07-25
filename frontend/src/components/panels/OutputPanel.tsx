@@ -190,7 +190,7 @@ export function OutputPanel({
       {runHistory.length > 0 && (
         <CollapsibleSection title="Run History" icon={Clock} defaultOpen={false}>
           <div className="space-y-2">
-            {runHistory.slice(0, 5).map((run, i) => (
+            {runHistory.slice(0, 5).map((run) => (
               <div
                 key={run.id}
                 className="text-xs p-2.5 rounded-lg bg-white/[0.02] border border-white/5 space-y-1"

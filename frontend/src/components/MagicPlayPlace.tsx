@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { Play } from 'lucide-react';
 
 import { useBackendDiagnostics } from '../hooks/useBackendDiagnostics';
 import { useAlgorithmWorkflow } from '../hooks/useAlgorithmWorkflow';
@@ -89,7 +90,15 @@ export default function MagicPlayPlace() {
       <header className="glass-panel border-t-0 border-x-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-8 py-3">
           <div className="flex items-center gap-3">
-            <Sparkles className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+            <Image
+              src="/magic-play-place-logo.png"
+              alt=""
+              width={926}
+              height={612}
+              style={{ width: 42, height: 'auto', flexShrink: 0 }}
+              priority
+              aria-hidden="true"
+            />
             <h1 className="text-base font-semibold tracking-[0.25em] uppercase">
               Magic Play Place
             </h1>

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logo.jpeg" width="220" alt="Magic Play Place logo" />
+<img src="frontend/public/magic-play-place-logo.png" width="260" alt="Magic Play Place logo" />
 
 # Magic Play Place
 
@@ -134,7 +134,7 @@ curl http://localhost:8000/health
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local          # set NEXT_PUBLIC_API_BASE_URL, e.g. http://localhost:8000
+# Optional: create .env.local when overriding the default http://localhost:8000 backend.
 npm run dev                         # http://localhost:3000
 ```
 
@@ -354,13 +354,15 @@ magic-play-place/
 │   └── k8s/
 │       ├── magic-play-place.yaml      baseline manifest (probes + resource limits)
 │       └── backend-worker-hpa.yaml    worker horizontal pod autoscaler
+├── frontend/
+│   ├── public/magic-play-place-logo.png   transparent UI and documentation logo
+│   └── src/app/favicon.ico                 transparent multi-size browser icon
 ├── docs/
 │   ├── RESEARCH_USE_AND_EVIDENCE_POLICY.md
 │   ├── GENERATE_MODEL_LOOP_VALIDATION_PLAN.md
 │   └── reports/             Gate 1 / Gate 2 / Gate 3 artifacts
 ├── ROADMAP.md
-├── DEPLOYMENT.md
-└── logo.jpeg
+└── DEPLOYMENT.md
 ```
 
 ---
