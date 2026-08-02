@@ -9,7 +9,6 @@ import { useAlgorithmWorkflow } from '../hooks/useAlgorithmWorkflow';
 import { ControlPanel } from './panels/ControlPanel';
 import { OutputPanel } from './panels/OutputPanel';
 import { CenterStatusVisualizer } from './visualizer/CenterStatusVisualizer';
-import { Tag } from './ui/Tag';
 import {
   COHORT_LABELS,
   MODES,
@@ -104,7 +103,6 @@ export default function MagicPlayPlace() {
         <span className="font-[family-name:var(--font-heading)] text-[19px]">
           Magic Play Place
         </span>
-        <Tag tone="tag-accent-2">research, gently</Tag>
 
         <nav
           className="ml-auto inline-flex gap-1 rounded-full border p-1"

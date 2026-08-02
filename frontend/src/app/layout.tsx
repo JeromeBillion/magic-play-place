@@ -22,7 +22,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Magic Play Place — research, gently",
+  title: "Magic Play Place",
   description:
     "Show a model a sentence, a picture, a clip or a sound, and see how a brain might respond — with every finding labelled by how much to trust it. Research use only, never medical advice.",
   keywords: ["neuroscience", "AI", "fMRI", "brain", "research", "prediction"],
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   // The browser icon comes from app/favicon.ico — a transparent, multi-size
   // build. Don't override it here with a single large PNG.
   openGraph: {
-    title: "Magic Play Place — research, gently",
+    title: "Magic Play Place",
     description:
       "Show a model a sentence, a picture, a clip or a sound, and see how a brain might respond — every finding labelled by how much to trust it.",
     type: "website",
