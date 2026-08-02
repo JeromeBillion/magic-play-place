@@ -7,6 +7,9 @@ export type InferenceMode = 'mock' | 'tribe' | 'unknown';
 export type GenerationMode = 'simulation' | 'model_loop' | 'unknown';
 export type BackendReachability = 'checking' | 'online' | 'offline';
 
+/** What the app is doing right now — drives every empty/busy/result surface. */
+export type RunStatus = 'idle' | 'loading' | 'results' | 'error';
+
 export type BackendHealthResponse = {
   status?: string;
   queue_backend?: string;
@@ -39,6 +42,18 @@ export type BackendHealthResponse = {
   job_queue_depth?: number;
 };
 
+/**
+ * One line of output, carrying its own honesty label. `tag` is a backend
+ * evidence tag ('observed' | 'inferred' | 'hypothesis' | 'low_confidence');
+ * see `lib/copy.ts` for the words the user actually sees.
+ */
+export type Finding = {
+  text: string;
+  tag: string;
+  /** Set when the line reports a failure rather than a result. */
+  isError?: boolean;
+};
+
 /** A single run result stored in session history (UX5). */
 export type RunResult = {
   id: string;
@@ -46,7 +61,7 @@ export type RunResult = {
   mode: Mode;
   analysis: string;
   remarks: string;
-  findings: string[];
+  findings: Finding[];
   inferenceMode: InferenceMode;
   generationMode: GenerationMode;
   isMock: boolean;

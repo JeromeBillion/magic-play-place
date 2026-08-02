@@ -3,68 +3,63 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import { ControlPanel } from "./ControlPanel";
 
+const baseProps = {
+  stimulusType: "text" as const,
+  setStimulusType: jest.fn(),
+  textInput: "",
+  setTextInput: jest.fn(),
+  mediaFile: null,
+  setMediaFile: jest.fn(),
+  fileInputRef: { current: null },
+  valence: 50,
+  setValence: jest.fn(),
+  arousal: 50,
+  setArousal: jest.fn(),
+  modality: "audio" as const,
+  setModality: jest.fn(),
+  profile: "neurotypical" as const,
+  setProfile: jest.fn(),
+  cohort: "adult" as const,
+  setCohort: jest.fn(),
+};
+
 describe("ControlPanel", () => {
-  it("renders text stimulus inputs when text is selected in discovery mode", () => {
-    const mockSetStimulusType = jest.fn();
-    const mockSetTextInput = jest.fn();
+  it("renders text stimulus inputs when text is selected in Explore mode", () => {
+    render(<ControlPanel {...baseProps} mode="discovery" textInput="test prompt" />);
 
-    render(
-      <ControlPanel
-        mode="discovery"
-        stimulusType="text"
-        setStimulusType={mockSetStimulusType}
-        textInput="test prompt"
-        setTextInput={mockSetTextInput}
-        mediaFile={null}
-        setMediaFile={jest.fn()}
-        openFilePicker={jest.fn()}
-        fileInputRef={{ current: null }}
-        valence={50}
-        setValence={jest.fn()}
-        arousal={50}
-        setArousal={jest.fn()}
-        modality="audio"
-        setModality={jest.fn()}
-        profile="neurotypical"
-        setProfile={jest.fn()}
-        cohort="adult"
-        setCohort={jest.fn()}
-      />
-    );
-
-    expect(screen.getByText("Stimulus Type")).toBeInTheDocument();
+    expect(screen.getByText("What should we show it?")).toBeInTheDocument();
     expect(screen.getByDisplayValue("test prompt")).toBeInTheDocument();
+    // Stimulus types are shown in the app's plain-spoken wording.
+    expect(screen.getByRole("radio", { name: "Stimulus type: text" })).toBeInTheDocument();
+    expect(screen.getByText("a picture")).toBeInTheDocument();
   });
 
-  it("renders valence and arousal sliders in therapeutics mode", () => {
-    render(
-      <ControlPanel
-        mode="therapeutics"
-        stimulusType="text"
-        setStimulusType={jest.fn()}
-        textInput=""
-        setTextInput={jest.fn()}
-        mediaFile={null}
-        setMediaFile={jest.fn()}
-        openFilePicker={jest.fn()}
-        fileInputRef={{ current: null }}
-        valence={75}
-        setValence={jest.fn()}
-        arousal={35}
-        setArousal={jest.fn()}
-        modality="audio"
-        setModality={jest.fn()}
-        profile="neurotypical"
-        setProfile={jest.fn()}
-        cohort="adult"
-        setCohort={jest.fn()}
-      />
-    );
+  it("swaps the textarea for a drop zone when a file stimulus is selected", () => {
+    render(<ControlPanel {...baseProps} mode="discovery" stimulusType="image" />);
 
-    // Label and value are now separate elements
-    expect(screen.getByText("Valence")).toBeInTheDocument();
-    expect(screen.getByText("75%")).toBeInTheDocument();
-    expect(screen.getByText("Arousal")).toBeInTheDocument();
-    expect(screen.getByText("35%")).toBeInTheDocument();
+    expect(screen.getByText("Drop your file here, or browse")).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("test prompt")).not.toBeInTheDocument();
+  });
+
+  it("renders mood and energy sliders in Shape mode", () => {
+    render(<ControlPanel {...baseProps} mode="therapeutics" valence={75} arousal={35} />);
+
+    // Label and value are separate elements.
+    expect(screen.getByText("Mood")).toBeInTheDocument();
+    expect(screen.getByText("75")).toBeInTheDocument();
+    expect(screen.getByText("Energy")).toBeInTheDocument();
+    expect(screen.getByText("35")).toBeInTheDocument();
+    expect(screen.getByText("Deliver it as")).toBeInTheDocument();
+  });
+
+  it("renders profile and age choices in Tune mode", () => {
+    render(<ControlPanel {...baseProps} mode="conditioning" profile="adhd" />);
+
+    expect(screen.getByText("Who are we modelling?")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /ADHD/ })).toHaveAttribute(
+      "aria-checked",
+      "true"
+    );
+    expect(screen.getByRole("radio", { name: "Age cohort: adult" })).toBeInTheDocument();
   });
 });

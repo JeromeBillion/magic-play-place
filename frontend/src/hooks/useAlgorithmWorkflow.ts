@@ -1,9 +1,17 @@
 import { useState, useMemo, useCallback } from 'react';
 import { submitPredict, submitGenerate } from '../lib/api';
 import {
+  COHORT_LABELS,
+  MODALITY_LABELS,
+  PROFILE_LABELS,
+  STIMULUS_LABELS,
+} from '../lib/copy';
+import {
   Mode,
+  Finding,
   GenerationMode,
   Modality,
+  RunStatus,
   StimulusType,
   NeurologicalProfile,
   AgeCohort,
@@ -30,6 +38,16 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' ? (value as Record<string, unknown>) : null;
 }
 
+function asText(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+/** Renders whatever the backend put in a metric slot without inventing one. */
+function asMetric(value: unknown): string | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(+value.toFixed(3));
+  return asText(value);
+}
+
 const MAX_HISTORY = 8;
 
 export function useAlgorithmWorkflow(
@@ -37,21 +55,20 @@ export function useAlgorithmWorkflow(
   setLastRequestId: (id: string) => void,
   setLastInferenceMode: (mode: InferenceMode) => void
 ) {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [analysis, setAnalysis] = useState(
-    'Configure inputs, then run the algorithm to generate neural response analysis.'
-  );
-  const [remarks, setRemarks] = useState('Awaiting computational logic instructions...');
-  const [findings, setFindings] = useState<string[]>([
-    'Neural pathway correlation: pending',
-    'Dopamine receptor activation: pending',
-    'Prefrontal cortex engagement: pending',
-  ]);
+  const [status, setStatus] = useState<RunStatus>('idle');
+  /** Missing input is the user's to fix; anything else is ours. */
+  const [errorKind, setErrorKind] = useState<'validation' | 'backend'>('backend');
+  const [resultTitle, setResultTitle] = useState('');
+  const [analysis, setAnalysis] = useState('');
+  const [remarks, setRemarks] = useState('');
+  const [findings, setFindings] = useState<Finding[]>([]);
   const [lastGenerationMode, setLastGenerationMode] = useState<GenerationMode>('unknown');
   const [lastBackendError, setLastBackendError] = useState<string>('none');
   const [isMockResult, setIsMockResult] = useState(false);
   const [evidenceTags, setEvidenceTags] = useState<string[]>([]);
   const [runHistory, setRunHistory] = useState<RunResult[]>([]);
+
+  const isProcessing = status === 'loading';
 
   const sessionId = useMemo(
     () => `NRL-${Math.random().toString(36).slice(2, 11).toUpperCase()}`,
@@ -97,20 +114,26 @@ export function useAlgorithmWorkflow(
     arousal: number;
     modality: Modality;
   }) => {
-    // UX6: Conditioning is instant — no fake processing
+    const who = `${PROFILE_LABELS[profile]} · ${COHORT_LABELS[cohort]}`;
+
+    // UX6: Tune is instant — no fake processing.
     if (mode === 'conditioning') {
-      const condAnalysis = `Conditioning profile applied.\nNeurological profile: ${profile.toUpperCase()}\nAge cohort: ${cohort.toUpperCase()}`;
-      const condRemarks = 'Future discovery and therapeutics runs will be evaluated under the updated demographic substrate.';
-      const condFindings = [
-        'CONDITIONING baseline updated',
-        `Active cohort: ${profile}/${cohort}`,
+      const condTitle = 'Profile saved';
+      const condAnalysis = `Done. Every run from now on models a ${PROFILE_LABELS[profile]} ${COHORT_LABELS[cohort]}.`;
+      const condRemarks =
+        'Explore and Shape runs will be read against this profile from here on.';
+      const condFindings: Finding[] = [
+        { text: 'Baseline updated', tag: 'observed' },
+        { text: `Modelling for ${who}`, tag: 'observed' },
       ];
       setLastBackendError('none');
+      setResultTitle(condTitle);
       setAnalysis(condAnalysis);
       setRemarks(condRemarks);
       setIsMockResult(false);
       setEvidenceTags([]);
-      setFindings((prev) => [...condFindings, ...prev.slice(0, 3)]);
+      setFindings(condFindings);
+      setStatus('results');
       addToHistory({
         id: crypto.randomUUID(),
         timestamp: new Date().toISOString(),
@@ -127,12 +150,14 @@ export function useAlgorithmWorkflow(
       return;
     }
 
-    setIsProcessing(true);
+    setStatus('loading');
+    let kind: 'validation' | 'backend' = 'backend';
 
     try {
+      let resultTitleText = '';
       let resultAnalysis = '';
       let resultRemarks = '';
-      let resultFindings: string[] = [];
+      let resultFindings: Finding[] = [];
       let resultInferenceMode: InferenceMode = 'unknown';
       let resultGenerationMode: GenerationMode = 'unknown';
       let resultIsMock = false;
@@ -140,10 +165,12 @@ export function useAlgorithmWorkflow(
 
       if (mode === 'discovery') {
         if (stimulusType === 'text' && !textInput.trim()) {
-          throw new Error('Please enter text input before running discovery mode.');
+          kind = 'validation';
+          throw new Error('Add a few words first, then run it.');
         }
         if (stimulusType !== 'text' && !mediaFile) {
-          throw new Error(`Please upload a ${stimulusType} file before running discovery mode.`);
+          kind = 'validation';
+          throw new Error(`Choose ${STIMULUS_LABELS[stimulusType]} first, then run it.`);
         }
 
         const formData = new FormData();
@@ -159,39 +186,34 @@ export function useAlgorithmWorkflow(
         const { data, requestId } = await submitPredict(formData);
         const insights = asRecord(data?.insights);
         setLastRequestId(requestId);
+
         const description =
-          (typeof insights?.description === 'string' ? insights.description : null) ??
-          (typeof data?.message === 'string' ? data.message : null) ??
-          'Prediction complete.';
-        const crossModal =
-          (typeof insights?.cross_modal_guide === 'string' ? insights.cross_modal_guide : null) ??
-          'No cross-modal recommendation was returned by the backend.';
+          asText(insights?.description) ?? asText(data?.message) ?? 'The run finished.';
+        const crossModal = asText(insights?.cross_modal_guide);
         const tags = Array.isArray(data?.evidence_tags) ? data.evidence_tags.map(String) : [];
         const disclaimer =
-          typeof data?.scientific_disclaimer === 'string'
-            ? data.scientific_disclaimer
-            : 'Research-use output only. Not clinical advice.';
-        const mockFlag = data?.mock_data === true || (typeof insights?.mock_data === 'boolean' && insights.mock_data);
+          asText(data?.scientific_disclaimer) ?? 'Research-use output only. Not clinical advice.';
+        const mockFlag =
+          data?.mock_data === true ||
+          (typeof insights?.mock_data === 'boolean' && insights.mock_data);
 
+        const timesteps = asMetric(data?.timesteps);
+        const vertices = asMetric(data?.vertices);
+
+        resultTitleText = 'What the model saw';
         resultAnalysis = description;
-        resultRemarks = `${crossModal}\n\nDisclaimer: ${disclaimer}`;
+        resultRemarks = disclaimer;
         resultInferenceMode = normalizeInferenceMode(data?.inference_mode);
         resultIsMock = !!mockFlag;
         resultTags = tags;
         resultFindings = [
-          `DISCOVERY completed (${stimulusType.toUpperCase()})`,
-          `Output shape: ${data?.timesteps ?? 'n/a'} timesteps × ${data?.vertices ?? 'n/a'} vertices`,
-          `Evidence tags: ${tags.length > 0 ? tags.join(', ') : 'n/a'}`,
-        ];
-
-        setAnalysis(resultAnalysis);
-        setRemarks(resultRemarks);
-        setLastInferenceMode(resultInferenceMode);
-        setIsMockResult(resultIsMock);
-        setEvidenceTags(resultTags);
-        setLastBackendError('none');
-        setFindings((prev) => [...resultFindings, ...prev.slice(0, 3)]);
-      } else if (mode === 'therapeutics') {
+          timesteps && vertices
+            ? { text: `${timesteps} timesteps × ${vertices} vertices`, tag: 'observed' }
+            : null,
+          { text: `Read from ${STIMULUS_LABELS[stimulusType]}, for ${who}`, tag: 'observed' },
+          crossModal ? { text: crossModal, tag: 'hypothesis' } : null,
+        ].filter((f): f is Finding => f !== null);
+      } else {
         const payloadData = {
           valence,
           arousal,
@@ -203,49 +225,60 @@ export function useAlgorithmWorkflow(
         const { data, requestId } = await submitGenerate(payloadData);
         setLastRequestId(requestId);
 
-        const metrics = asRecord(data?.optimization_metrics) ?? asRecord(data?.simulated_optimization_metrics);
-        const generationMode =
-          typeof data?.generation_mode === 'string' ? data.generation_mode : 'simulation';
-        const iterations = typeof data?.iterations === 'number' ? data.iterations : 'n/a';
-        const generatedPayload =
-          typeof data?.generated_payload === 'string' ? data.generated_payload : 'n/a';
-        const validationReference =
-          typeof data?.validation_reference === 'string' ? data.validation_reference : null;
+        const metrics =
+          asRecord(data?.optimization_metrics) ?? asRecord(data?.simulated_optimization_metrics);
+        const generationMode = normalizeGenerationMode(data?.generation_mode);
+        const iterations = asMetric(data?.iterations);
+        const generatedPayload = asText(data?.generated_payload);
+        const validationReference = asText(data?.validation_reference);
         const scientificDisclaimer =
-          typeof data?.scientific_disclaimer === 'string'
-            ? data.scientific_disclaimer
-            : 'Simulation mode only.';
-        const loopType = typeof data?.loop_type === 'string' ? data.loop_type : 'simulation';
-        const metricSummary =
-          metrics && typeof metrics === 'object'
-            ? `\nBaseline distance: ${metrics.baseline_distance ?? 'n/a'}\nFinal distance: ${
-                metrics.final_distance ?? 'n/a'
-              }\nImprovement: ${metrics.improvement ?? 'n/a'}`
-            : '';
-        const validationRef = validationReference ? `\nValidation ref: ${validationReference}` : '';
-        
-        resultAnalysis = `Therapeutics ${generationMode.toUpperCase()} complete.\nIterations: ${iterations}\nPayload: ${generatedPayload}${metricSummary}${validationRef}`;
-        resultRemarks = `${scientificDisclaimer}\n\nTarget baseline: ${profile.toUpperCase()} / ${cohort.toUpperCase()}.`;
+          asText(data?.scientific_disclaimer) ?? 'Simulation mode only.';
+        const loopType = asText(data?.loop_type) ?? 'simulation';
+        const improvement = asMetric(metrics?.improvement);
+        const finalDistance = asMetric(metrics?.final_distance);
+        const baselineDistance = asMetric(metrics?.baseline_distance);
+
+        resultTitleText =
+          generationMode === 'model_loop' ? 'Model loop finished' : 'Simulation finished';
+        resultAnalysis = [
+          `We simulated a ${MODALITY_LABELS[modality]}-based nudge toward mood ${valence} and energy ${arousal}.`,
+          generatedPayload ? `It produced: ${generatedPayload}.` : null,
+        ]
+          .filter(Boolean)
+          .join(' ');
+        resultRemarks = scientificDisclaimer;
         resultInferenceMode = normalizeInferenceMode(data?.inference_mode);
-        resultGenerationMode = normalizeGenerationMode(data?.generation_mode);
+        resultGenerationMode = generationMode;
         resultIsMock = loopType === 'simulation';
         resultTags = [];
         resultFindings = [
-          `THERAPEUTICS ${generationMode.toUpperCase()} completed`,
-          `Target vectors: valence=${valence}, arousal=${arousal}, modality=${modality}`,
-        ];
-
-        setAnalysis(resultAnalysis);
-        setRemarks(resultRemarks);
-        setLastInferenceMode(resultInferenceMode);
-        setLastGenerationMode(resultGenerationMode);
-        setIsMockResult(resultIsMock);
-        setEvidenceTags(resultTags);
-        setLastBackendError('none');
-        setFindings((prev) => [...resultFindings, ...prev.slice(0, 3)]);
+          iterations ? { text: `${iterations} iterations`, tag: 'observed' } : null,
+          improvement
+            ? { text: `Improvement: ${improvement}`, tag: 'observed' }
+            : baselineDistance && finalDistance
+              ? {
+                  text: `Distance ${baselineDistance} → ${finalDistance}`,
+                  tag: 'observed',
+                }
+              : null,
+          { text: `Aimed for mood ${valence} · energy ${arousal}, for ${who}`, tag: 'observed' },
+          validationReference
+            ? { text: `Validation ref: ${validationReference}`, tag: 'inferred' }
+            : null,
+        ].filter((f): f is Finding => f !== null);
       }
 
-      // Add to history
+      setResultTitle(resultTitleText);
+      setAnalysis(resultAnalysis);
+      setRemarks(resultRemarks);
+      setLastInferenceMode(resultInferenceMode);
+      setLastGenerationMode(resultGenerationMode);
+      setIsMockResult(resultIsMock);
+      setEvidenceTags(resultTags);
+      setLastBackendError('none');
+      setFindings(resultFindings);
+      setStatus('results');
+
       addToHistory({
         id: crypto.randomUUID(),
         timestamp: new Date().toISOString(),
@@ -267,23 +300,29 @@ export function useAlgorithmWorkflow(
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unexpected error occurred.';
+      const message = error instanceof Error ? error.message : 'Something went wrong.';
       const requestMatch = message.match(/\[([a-f0-9]{12})\]/i);
       if (requestMatch?.[1]) {
         setLastRequestId(requestMatch[1]);
       }
       setLastBackendError(message);
-      setAnalysis(message);
-      setRemarks('Check backend availability (default: http://localhost:8000) and input validity.');
-      setFindings((prev) => [`ERROR: ${message}`, ...prev.slice(0, 4)]);
+      setErrorKind(kind);
+      setResultTitle('');
+      setAnalysis('');
+      setRemarks('');
+      setFindings([{ text: message, tag: 'low_confidence', isError: true }]);
+      setStatus('error');
     } finally {
-      setIsProcessing(false);
-      await refreshHealth();
+      // A validation slip says nothing about the backend, so don't re-poll it.
+      if (kind !== 'validation') await refreshHealth();
     }
   };
 
   return {
+    status,
+    errorKind,
     isProcessing,
+    resultTitle,
     analysis,
     remarks,
     findings,

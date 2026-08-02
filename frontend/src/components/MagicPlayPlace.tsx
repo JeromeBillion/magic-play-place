@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
 
@@ -10,16 +9,31 @@ import { useAlgorithmWorkflow } from '../hooks/useAlgorithmWorkflow';
 import { ControlPanel } from './panels/ControlPanel';
 import { OutputPanel } from './panels/OutputPanel';
 import { CenterStatusVisualizer } from './visualizer/CenterStatusVisualizer';
+import { Tag } from './ui/Tag';
+import {
+  COHORT_LABELS,
+  MODES,
+  MODE_LABELS,
+  PROFILE_LABELS,
+  RUNNING_LABEL,
+  RUN_LABELS,
+} from '../lib/copy';
 
-import type { Mode, StimulusType, Modality, NeurologicalProfile, AgeCohort } from '../lib/types';
+import type {
+  Mode,
+  StimulusType,
+  Modality,
+  NeurologicalProfile,
+  AgeCohort,
+} from '../lib/types';
 
 export default function MagicPlayPlace() {
   // ─── UI State ───
   const [mode, setMode] = useState<Mode>('discovery');
   const [profile, setProfile] = useState<NeurologicalProfile>('neurotypical');
   const [cohort, setCohort] = useState<AgeCohort>('adult');
-  const [valence, setValence] = useState(50);
-  const [arousal, setArousal] = useState(50);
+  const [valence, setValence] = useState(60);
+  const [arousal, setArousal] = useState(35);
   const [modality, setModality] = useState<Modality>('audio');
   const [stimulusType, setStimulusType] = useState<StimulusType>('text');
   const [textInput, setTextInput] = useState('');
@@ -40,14 +54,16 @@ export default function MagicPlayPlace() {
 
   // ─── Algorithm Workflow Hook ───
   const {
+    status,
+    errorKind,
     isProcessing,
+    resultTitle,
     analysis,
     remarks,
     findings,
     lastGenerationMode,
     lastBackendError,
     isMockResult,
-    evidenceTags,
     runHistory,
     sessionId,
     sessionTimestamp,
@@ -56,11 +72,6 @@ export default function MagicPlayPlace() {
   } = useAlgorithmWorkflow(refreshHealth, setLastRequestId, setLastInferenceMode);
 
   const diagnosticGuidance = buildGuidance(lastBackendError);
-
-  const openFilePicker = () => {
-    if (stimulusType === 'text') return;
-    fileInputRef.current?.click();
-  };
 
   const onRun = () => {
     void handleRunAlgorithm({
@@ -76,123 +87,118 @@ export default function MagicPlayPlace() {
     });
   };
 
-  const getRunLabel = () => {
-    if (mode === 'conditioning') return 'Apply Profile';
-    if (mode === 'therapeutics') {
-      return backendHealth?.generate_mode === 'model_loop' ? 'Run Model Loop' : 'Run Simulation';
-    }
-    return 'Run Discovery';
-  };
+  const runLabel = isProcessing ? RUNNING_LABEL : RUN_LABELS[mode];
 
   return (
-    <div className="min-h-screen mesh-bg text-white overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-bg text-ink">
       {/* ─── Header ─── */}
-      <header className="glass-panel border-t-0 border-x-0">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 sm:px-8 py-3">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/magic-play-place-logo.png"
-              alt=""
-              width={926}
-              height={612}
-              style={{ width: 42, height: 'auto', flexShrink: 0 }}
-              priority
-              aria-hidden="true"
-            />
-            <h1 className="text-base font-semibold tracking-[0.25em] uppercase">
-              Magic Play Place
-            </h1>
-            <span className="text-[9px] tracking-widest text-white/25 uppercase hidden sm:inline">
-              Neuro-AI Lab
-            </span>
-          </div>
-          <nav className="flex gap-0.5" role="tablist" aria-label="Mode navigation">
-            {(['discovery', 'therapeutics', 'conditioning'] as Mode[]).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                role="tab"
-                aria-selected={mode === m}
-                aria-label={`Switch to ${m} mode`}
-                data-mode={m}
-                className={`mode-btn ${mode === m ? 'active' : ''}`}
-              >
-                {m}
-              </button>
-            ))}
-          </nav>
-        </div>
+      <header className="flex flex-wrap items-center gap-4 border-b px-7 py-4">
+        <Image
+          src="/magic-play-place-logo-black.png"
+          alt=""
+          width={34}
+          height={34}
+          className="h-auto w-[34px]"
+          priority
+        />
+        <span className="font-[family-name:var(--font-heading)] text-[19px]">
+          Magic Play Place
+        </span>
+        <Tag tone="tag-accent-2">research, gently</Tag>
+
+        <nav
+          className="ml-auto inline-flex gap-1 rounded-full border p-1"
+          role="tablist"
+          aria-label="Mode"
+        >
+          {MODES.map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              role="tab"
+              aria-selected={mode === m}
+              aria-label={`Switch to ${m} mode`}
+              data-mode={m}
+              className={`mode-pill${mode === m ? ' mode-pill-active' : ''}`}
+            >
+              {MODE_LABELS[m]}
+            </button>
+          ))}
+        </nav>
       </header>
 
       {/* ─── Main Grid ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr_360px] gap-0 lg:h-[calc(100vh-57px)]">
+      <div className="grid gap-7 px-7 py-7 lg:grid-cols-[340px_1fr] xl:grid-cols-[340px_1fr_400px]">
         {/* ─── Left: Controls ─── */}
-        <div className="border-b lg:border-b-0 lg:border-r border-white/[0.06] p-5 sm:p-6 overflow-y-auto">
-          <div className="space-y-6">
-            <div className="section-label accent">Control Panel</div>
-
-            <ControlPanel
-              mode={mode}
-              stimulusType={stimulusType}
-              setStimulusType={setStimulusType}
-              textInput={textInput}
-              setTextInput={setTextInput}
-              mediaFile={mediaFile}
-              setMediaFile={setMediaFile}
-              openFilePicker={openFilePicker}
-              fileInputRef={fileInputRef}
-              valence={valence}
-              setValence={setValence}
-              arousal={arousal}
-              setArousal={setArousal}
-              modality={modality}
-              setModality={setModality}
-              profile={profile}
-              setProfile={setProfile}
-              cohort={cohort}
-              setCohort={setCohort}
-            />
-
-            {/* Active Profile Badge */}
-            <div className="flex items-center gap-2 text-[10px] text-white/30 uppercase tracking-widest">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-              {profile} / {cohort}
-            </div>
-
-            {/* Run Button */}
-            <motion.button
-              onClick={onRun}
-              disabled={isProcessing}
-              className="run-btn"
-              whileHover={{ scale: isProcessing ? 1 : 1.015 }}
-              whileTap={{ scale: isProcessing ? 1 : 0.985 }}
-              aria-label={getRunLabel()}
-              id="run-algorithm-btn"
-            >
-              <span className="relative flex items-center justify-center gap-2">
-                <Play className="w-4 h-4" />
-                {getRunLabel()}
-              </span>
-            </motion.button>
+        <div className="flex flex-col gap-5 self-start rounded-[32px] bg-surface p-6">
+          <div>
+            <h4 className="mb-2">Set up a run</h4>
           </div>
+
+          <ControlPanel
+            mode={mode}
+            stimulusType={stimulusType}
+            setStimulusType={setStimulusType}
+            textInput={textInput}
+            setTextInput={setTextInput}
+            mediaFile={mediaFile}
+            setMediaFile={setMediaFile}
+            fileInputRef={fileInputRef}
+            valence={valence}
+            setValence={setValence}
+            arousal={arousal}
+            setArousal={setArousal}
+            modality={modality}
+            setModality={setModality}
+            profile={profile}
+            setProfile={setProfile}
+            cohort={cohort}
+            setCohort={setCohort}
+          />
+
+          {/* Active Profile Badge */}
+          <p className="text-muted flex items-center gap-2 text-[12px]">
+            <span
+              className="size-2 rounded-full bg-sage-500"
+              aria-hidden="true"
+            />
+            modelling for {PROFILE_LABELS[profile]} · {COHORT_LABELS[cohort]}
+          </p>
+
+          <button
+            type="button"
+            onClick={onRun}
+            disabled={isProcessing}
+            className="btn btn-primary btn-run"
+            id="run-algorithm-btn"
+          >
+            <Play size={15} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+            {runLabel}
+          </button>
         </div>
 
-        {/* ─── Center: Visualizer ─── */}
-        <div className="flex flex-col items-center justify-center p-4 sm:p-8 lg:p-10 relative border-b lg:border-b-0 border-white/[0.06]">
+        {/* ─── Centre: Visualiser ─── */}
+        <div className="flex items-center justify-center">
           <CenterStatusVisualizer
             profile={profile}
-            isProcessing={isProcessing}
-            mode={mode}
+            cohort={cohort}
+            status={status}
+            errorKind={errorKind}
             backendReachability={backendReachability}
           />
         </div>
 
         {/* ─── Right: Output ─── */}
-        <div className="lg:border-l border-white/[0.06] p-4 sm:p-5 overflow-y-auto">
+        <div className="self-start lg:col-span-2 xl:col-span-1">
           <OutputPanel
+            status={status}
+            errorKind={errorKind}
+            resultTitle={resultTitle}
             analysis={analysis}
-            findings={findings}
             remarks={remarks}
+            findings={findings}
+            isMockResult={isMockResult}
+            onRetry={onRun}
             sessionId={sessionId}
             sessionTimestamp={sessionTimestamp}
             mode={mode}
@@ -203,8 +209,6 @@ export default function MagicPlayPlace() {
             lastRequestId={lastRequestId}
             diagnosticGuidance={diagnosticGuidance}
             refreshHealth={() => void refreshHealth()}
-            isMockResult={isMockResult}
-            evidenceTags={evidenceTags}
             runHistory={runHistory}
             exportHistory={exportHistory}
           />

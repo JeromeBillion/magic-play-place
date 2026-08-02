@@ -1,26 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Caprasimo, Figtree } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+/** Caprasimo is the only display voice in the Organic system. */
+const caprasimo = Caprasimo({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-caprasimo",
+});
+
+/** Figtree carries every piece of body copy and interface text. */
+const figtree = Figtree({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-figtree",
 });
 
 export const viewport: Viewport = {
-  themeColor: "#06060e",
+  themeColor: "#f5ead8",
 };
 
 export const metadata: Metadata = {
-  title: "Magic Play Place — Neuro-AI Research Lab",
+  title: "Magic Play Place — research, gently",
   description:
-    "Research-grade neuroscience platform for predicting neural-response patterns from multimodal stimuli. Supports fMRI prediction, intervention simulation, and evidence-tagged analysis.",
+    "Show a model a sentence, a picture, a clip or a sound, and see how a brain might respond — with every finding labelled by how much to trust it. Research use only, never medical advice.",
   keywords: ["neuroscience", "AI", "fMRI", "brain", "research", "prediction"],
   authors: [{ name: "Magic Play Place" }],
+  // The browser icon comes from app/favicon.ico — a transparent, multi-size
+  // build. Don't override it here with a single large PNG.
   openGraph: {
-    title: "Magic Play Place — Neuro-AI Research Lab",
+    title: "Magic Play Place — research, gently",
     description:
-      "Research-grade neuroscience platform for predicting neural-response patterns from multimodal stimuli.",
+      "Show a model a sentence, a picture, a clip or a sound, and see how a brain might respond — every finding labelled by how much to trust it.",
     type: "website",
   },
 };
@@ -33,9 +45,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.className} h-full antialiased`}
+      className={`${caprasimo.variable} ${figtree.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col pt-0 m-0">{children}</body>
+      <body className="m-0 flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
