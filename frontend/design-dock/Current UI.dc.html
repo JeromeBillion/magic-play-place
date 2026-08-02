@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#06060e;color:#e0e4ef;font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}a:hover{color:rgba(255,255,255,0.5)}
+@keyframes meshShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes indeterminate{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
+@keyframes neuralPulse{0%,100%{opacity:0.3}50%{opacity:0.7}}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,0.08);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:#06d6a0;cursor:pointer;border-radius:50%;box-shadow:0 0 14px rgba(6,214,160,0.35),0 2px 8px rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.2)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;background:#06d6a0;cursor:pointer;border-radius:50%;border:2px solid rgba(255,255,255,0.2)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(ellipse at 20% 50%, rgba(6,214,160,0.06) 0%, transparent 50%),radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.05) 0%, transparent 50%),radial-gradient(ellipse at 50% 80%, rgba(6,182,212,0.04) 0%, transparent 50%),#06060e;background-size:200% 200%;animation:meshShift 20s ease infinite">
+  <header style="background:rgba(12,12,24,0.65);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 32px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <img src="frontend/public/magic-play-place-logo.png" alt="" style="width:42px;height:auto;flex-shrink:0">
+        <h1 style="margin:0;font-size:16px;font-weight:600;letter-spacing:0.25em;text-transform:uppercase;font-family:inherit">Magic Play Place</h1>
+        <span style="font-size:9px;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase">Neuro-AI Lab</span>
+      </div>
+      <nav style="display:flex;gap:2px" data-screen-label="Mode tabs">
+        <sc-for list="{{ modeTabs }}" as="m" hint-placeholder-count="3">
+          <button onClick="{{ m.pick }}" style="padding:8px 20px;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;border:none;background:transparent;cursor:pointer;font-family:inherit;color:{{ m.color }};border-bottom:{{ m.border }};box-shadow:{{ m.shadow }};transition:all 0.3s ease">{{ m.name }}</button>
+        </sc-for>
+      </nav>
+    </div>
+  </header>
+  <div style="display:grid;grid-template-columns:340px 1fr 360px;flex:1;min-height:0">
+    <div data-screen-label="Control panel" style="border-right:1px solid rgba(255,255,255,0.06);padding:24px;overflow-y:auto">
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#06d6a0">Control Panel</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.65">{{ modeDescription }}</div>
+        <sc-if value="{{ isDiscovery }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Stimulus Type</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <sc-for list="{{ stims }}" as="s" hint-placeholder-count="4">
+                  <button onClick="{{ s.pick }}" style="padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.25s ease;border:{{ s.border }};color:{{ s.color }};background:{{ s.bg }};box-shadow:{{ s.shadow }}">{{ s.name }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <sc-if value="{{ stimIsText }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <label style="display:block;margin-bottom:8px;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Text Input</label>
+                <textarea value="{{ text }}" onChange="{{ setText }}" placeholder="Describe a stimulus to predict neural response patterns..." style="width:100%;height:128px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;font-size:13px;color:#e0e4ef;resize:none;outline:none;font-family:'Inter',sans-serif"></textarea>
+              </div>
+            </sc-if>
+            <sc-if value="{{ stimIsMedia }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <label style="display:block;margin-bottom:8px;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">{{ stim }} Upload</label>
+                <button style="width:100%;border:1px dashed rgba(255,255,255,0.08);border-radius:10px;padding:28px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;background:transparent;font-family:inherit">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span style="font-size:12px;color:rgba(255,255,255,0.35)">Select {{ stim }} file</span>
+                </button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isTherapeutics }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Valence</span>
+                <span style="font-size:12px;font-weight:600;color:#8b5cf6">{{ valence }}%</span>
+              </div>
+              <input type="range" min="0" max="100" value="{{ valence }}" onChange="{{ setValence }}">
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.25);margin-top:4px;text-transform:uppercase;letter-spacing:0.1em"><span>Negative</span><span>Positive</span></div>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Arousal</span>
+                <span style="font-size:12px;font-weight:600;color:#8b5cf6">{{ arousal }}%</span>
+              </div>
+              <input type="range" min="0" max="100" value="{{ arousal }}" onChange="{{ setArousal }}">
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.25);margin-top:4px;text-transform:uppercase;letter-spacing:0.1em"><span>Calm</span><span>Excited</span></div>
+            </div>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Output Modality</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <sc-for list="{{ modalities }}" as="s" hint-placeholder-count="4">
+                  <button onClick="{{ s.pick }}" style="padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.25s ease;border:{{ s.border }};color:{{ s.color }};background:{{ s.bg }};box-shadow:{{ s.shadow }}">{{ s.name }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isConditioning }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px">
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Neurological Profile</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ profiles }}" as="s" hint-placeholder-count="3">
+                  <button onClick="{{ s.pick }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.25s ease;border:{{ s.border }};color:{{ s.color }};background:{{ s.bg }};box-shadow:{{ s.shadow }}"><span>{{ s.name }}</span><span style="font-size:9px;color:rgba(255,255,255,0.25);text-transform:none;letter-spacing:normal">{{ s.desc }}</span></button>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px">Age Cohort</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ cohorts }}" as="s" hint-placeholder-count="3">
+                  <button onClick="{{ s.pick }}" style="width:100%;padding:10px 12px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.25s ease;border:{{ s.border }};color:{{ s.color }};background:{{ s.bg }};box-shadow:{{ s.shadow }}">{{ s.name }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em">
+          <span style="width:6px;height:6px;border-radius:50%;background:#06d6a0"></span>
+          {{ profile }} / {{ cohort }}
+        </div>
+        <button onClick="{{ run }}" disabled="{{ processing }}" style="position:relative;width:100%;padding:14px;font-size:12px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#000;border:none;border-radius:10px;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#06d6a0,#34d399,#06b6d4);background-size:200% 200%;animation:gradientShift 4s ease infinite;box-shadow:0 4px 24px rgba(6,214,160,0.35);opacity:{{ runOpacity }}">
+          <span style="display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+            {{ runLabel }}
+          </span>
+        </button>
+      </div>
+    </div>
+    <div data-screen-label="Visualizer" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;position:relative">
+      <div style="width:100%;max-width:560px;display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;font-size:10px;text-transform:uppercase;letter-spacing:0.1em">
+          <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5)">
+            <span style="width:6px;height:6px;border-radius:50%;background:#f87171;box-shadow:0 0 8px rgba(248,113,113,0.6)"></span>
+            Model: <span style="color:{{ modeColor }};font-weight:600">Tribe v2</span>
+          </div>
+          <div style="color:rgba(255,255,255,0.5)">Profile: <span style="color:rgba(255,255,255,0.8);font-weight:500">{{ profile }}</span></div>
+          <div style="color:rgba(255,255,255,0.5)">Status: <span style="color:{{ statusColor }};font-weight:600">{{ statusLabel }}</span></div>
+        </div>
+        <div style="position:relative;aspect-ratio:1;max-width:420px;margin:0 auto;width:100%">
+          <div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle, {{ modeGlow }} 0%, transparent 70%);opacity:{{ glowOpacity }}"></div>
+          <svg viewBox="0 0 100 100" style="width:100%;height:100%;position:relative;z-index:10">
+            <defs>
+              <filter id="glowf"><feGaussianBlur stdDeviation="1.5" result="blur"></feGaussianBlur><feComposite in="SourceGraphic" in2="blur" operator="over"></feComposite></filter>
+              <radialGradient id="centerGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="{{ modeColor }}" stop-opacity="0.15"></stop><stop offset="100%" stop-color="{{ modeColor }}" stop-opacity="0"></stop></radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="42" fill="url(#centerGrad)"></circle>
+            <sc-for list="{{ conns }}" as="l" hint-placeholder-count="6">
+              <line x1="{{ l.x1 }}" y1="{{ l.y1 }}" x2="{{ l.x2 }}" y2="{{ l.y2 }}" stroke="{{ modeColor }}" stroke-width="0.3" opacity="{{ connOpacity }}"></line>
+            </sc-for>
+            <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="6">
+              <circle cx="{{ n.cx }}" cy="{{ n.cy }}" r="{{ n.r }}" fill="{{ n.fill }}" stroke="{{ modeColor }}" stroke-width="{{ n.sw }}" opacity="{{ n.op }}" filter="url(#glowf)"></circle>
+            </sc-for>
+            <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="{{ modeColor }}" font-size="3.5" font-weight="600" letter-spacing="0.15em" opacity="0.85">{{ centerLabel }}</text>
+          </svg>
+        </div>
+        <sc-if value="{{ processing }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="position:relative;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden"><div style="position:absolute;top:0;left:0;width:30%;height:100%;background:linear-gradient(90deg,transparent,{{ modeColor }},transparent);border-radius:2px;animation:indeterminate 1.5s ease-in-out infinite"></div></div>
+            <div style="font-size:10px;text-align:center;letter-spacing:0.1em;text-transform:uppercase;color:{{ modeColor }}">Processing neural inference...</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    <div data-screen-label="Output panel" style="border-left:1px solid rgba(255,255,255,0.06);padding:20px;overflow-y:auto">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <sc-if value="{{ mock }}" hint-placeholder-val="{{ false }}">
+          <div style="background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(248,113,113,0.08));border:1px solid rgba(245,158,11,0.25);border-radius:8px;padding:10px 14px;font-size:11px;font-weight:600;color:#f59e0b;letter-spacing:0.05em;text-transform:uppercase;display:flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+            <span>Synthetic Output — Mock inference mode active</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ hasTags }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ tags }}" as="t" hint-placeholder-count="3">
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;border:1px solid {{ t.border }};color:{{ t.color }};background:{{ t.bg }}">{{ t.sym }} {{ t.name }}</span>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:#06d6a0;margin-bottom:12px">Analysis</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.75);white-space:pre-wrap;line-height:1.65">{{ analysis }}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px">
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px">Findings</div>
+          <div style="display:flex;flex-direction:column;gap:8px;max-height:160px;overflow-y:auto">
+            <sc-for list="{{ findings }}" as="f" hint-placeholder-count="3">
+              <div style="font-size:12px;color:rgba(255,255,255,0.65);display:flex;align-items:flex-start;gap:8px">
+                <span style="width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0;background:{{ f.dot }};box-shadow:0 0 6px {{ f.dotGlow }}"></span>
+                <span>{{ f.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ hasRemarks }}" hint-placeholder-val="{{ false }}">
+          <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.15);border-left:3px solid rgba(248,113,113,0.5);border-radius:0 8px 8px 0;padding:12px 16px;font-size:11px;color:rgba(248,113,113,0.85);line-height:1.5;white-space:pre-wrap">{{ remarks }}</div>
+        </sc-if>
+        <sc-if value="{{ ran }}" hint-placeholder-val="{{ false }}">
+          <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
+            <button onClick="{{ toggleHistory }}" style="width:100%;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;font-family:inherit">
+              <span style="display:flex;align-items:center;gap:8px">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Run History</span>
+              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ chevHistory }};transition:transform 0.2s"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            <sc-if value="{{ openHistory }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 16px 16px">
+                <div style="font-size:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:4px">
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-weight:500;color:rgba(255,255,255,0.6)">{{ histMode }}</span><span style="font-size:9px;color:rgba(255,255,255,0.3)">{{ histTime }}</span></div>
+                  <div style="color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ histLine }}</div>
+                </div>
+                <button style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 0;margin-top:8px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.4);background:transparent;border:none;cursor:pointer;font-family:inherit">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Export JSON
+                </button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
+          <button onClick="{{ toggleSession }}" style="width:100%;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;font-family:inherit">
+            <span style="display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+              <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Session</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ chevSession }};transition:transform 0.2s"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          <sc-if value="{{ openSession }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 16px 16px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:10px">
+                <span style="color:rgba(255,255,255,0.3)">Session</span><span style="color:rgba(255,255,255,0.55);font-family:monospace">{{ sessionId }}</span>
+                <span style="color:rgba(255,255,255,0.3)">Mode</span><span style="color:rgba(255,255,255,0.55)">{{ modeUpper }}</span>
+                <span style="color:rgba(255,255,255,0.3)">Started</span><span style="color:rgba(255,255,255,0.55)">{{ sessionTs }}</span>
+                <span style="color:rgba(255,255,255,0.3)">Inference</span><span style="color:rgba(255,255,255,0.55)">UNKNOWN</span>
+                <span style="color:rgba(255,255,255,0.3)">Generation</span><span style="color:rgba(255,255,255,0.55)">UNKNOWN</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
+          <button onClick="{{ toggleDiag }}" style="width:100%;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;cursor:pointer;font-family:inherit">
+            <span style="display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>
+              <span style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Diagnostics</span>
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ chevDiag }};transition:transform 0.2s"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          <sc-if value="{{ openDiag }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:10px">
+                <span style="color:rgba(255,255,255,0.3)">API</span><span style="color:rgba(255,255,255,0.5);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">http://localhost:8000</span>
+                <span style="color:rgba(255,255,255,0.3)">Key</span><span style="color:rgba(255,255,255,0.5)">✗ not set</span>
+                <span style="color:rgba(255,255,255,0.3)">Status</span><span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#f87171;box-shadow:0 0 8px rgba(248,113,113,0.6)"></span><span style="color:rgba(255,255,255,0.5)">OFFLINE</span></span>
+                <span style="color:rgba(255,255,255,0.3)">Queue</span><span style="color:rgba(255,255,255,0.5)">UNKNOWN</span>
+                <span style="color:rgba(255,255,255,0.3)">Inference</span><span style="color:rgba(255,255,255,0.5)">UNKNOWN</span>
+                <span style="color:rgba(255,255,255,0.3)">Generate</span><span style="color:rgba(255,255,255,0.5)">UNKNOWN</span>
+                <span style="color:rgba(255,255,255,0.3)">Tribe</span><span style="color:rgba(255,255,255,0.5)">unknown</span>
+                <span style="color:rgba(255,255,255,0.3)">Request ID</span><span style="color:rgba(255,255,255,0.5);font-family:monospace">none</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.4)">Guidance</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.45);padding-left:10px;border-left:1px solid rgba(255,255,255,0.1);line-height:1.6">Backend unreachable at http://localhost:8000. Verify backend server and NEXT_PUBLIC_API_BASE_URL.</div>
+              </div>
+              <button style="width:100%;padding:8px 0;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.4);background:transparent;cursor:pointer;font-family:inherit">Refresh Health</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer style="border-top:1px solid rgba(255,255,255,0.06);padding:8px 16px;text-align:center;font-size:10px;color:rgba(255,255,255,0.3)">© 2026 Magic Play Place by <a href="https://vlivecapital.com/" target="_blank" rel="noopener noreferrer">Vlive Capital</a> (Pty) Ltd. Reg. 2026/569751/07</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode:'discovery', stim:'text', modality:'audio', profile:'neurotypical', cohort:'adult',
+    valence:50, arousal:50, text:'', processing:false, ran:false, mock:false,
+    analysis:'Configure inputs, then run the algorithm to generate neural response analysis.',
+    remarks:'', resultFindings:[], tagList:[], histMode:'', histTime:'', histLine:'',
+    openSession:false, openDiag:false, openHistory:false };
+  constructor(props){ super(props);
+    this.sessionId = 'NRL-' + Math.random().toString(36).slice(2,11).toUpperCase();
+    this.sessionTs = new Date().toISOString().split('.')[0];
+    this.NODES = [{cx:50,cy:18,r:3.5},{cx:25,cy:32,r:3},{cx:75,cy:32,r:3},{cx:15,cy:52,r:2.5},{cx:50,cy:50,r:5},{cx:85,cy:52,r:2.5},{cx:25,cy:70,r:3},{cx:75,cy:70,r:3},{cx:50,cy:85,r:3.5},{cx:38,cy:40,r:2},{cx:62,cy:40,r:2},{cx:38,cy:62,r:2},{cx:62,cy:62,r:2}];
+    this.CONNS = [[0,1],[0,2],[0,4],[1,3],[1,4],[1,9],[2,5],[2,4],[2,10],[3,6],[3,4],[4,5],[4,6],[4,7],[4,9],[4,10],[4,11],[4,12],[5,7],[6,8],[7,8],[9,11],[10,12],[11,12]];
+  }
+  componentWillUnmount(){ clearTimeout(this._t); }
+  modeColor(m){ return m==='therapeutics' ? {p:'#8b5cf6',g:'rgba(139,92,246,0.4)'} : m==='conditioning' ? {p:'#f59e0b',g:'rgba(245,158,11,0.4)'} : {p:'#06d6a0',g:'rgba(6,214,160,0.4)'}; }
+  run = () => {
+    const st = this.state;
+    if (st.processing) return;
+    const stamp = new Date().toLocaleTimeString();
+    if (st.mode === 'conditioning') {
+      const a = 'Conditioning profile applied.\nNeurological profile: ' + st.profile.toUpperCase() + '\nAge cohort: ' + st.cohort.toUpperCase();
+      this.setState({ ran:true, mock:false, tagList:[], analysis:a,
+        remarks:'Future discovery and therapeutics runs will be evaluated under the updated demographic substrate.',
+        resultFindings:['CONDITIONING baseline updated','Active cohort: '+st.profile+'/'+st.cohort],
+        histMode:'CONDITIONING', histTime:stamp, histLine:'Conditioning profile applied.' });
+      return;
+    }
+    this.setState({ processing:true });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => {
+      if (st.mode === 'discovery') {
+        const a = 'Synthetic neural response generated for ' + st.stim.toUpperCase() + ' stimulus. Predicted activation pattern is consistent with the ' + st.profile + ' baseline profile.';
+        this.setState({ processing:false, ran:true, mock:true, tagList:['observed','inferred','hypothesis'], analysis:a,
+          remarks:'Cross-modal recommendation: pair this stimulus with low-arousal audio for stronger engagement.\n\nDisclaimer: Non-clinical research output. Not for diagnostic or therapeutic use.',
+          resultFindings:['DISCOVERY completed ('+st.stim.toUpperCase()+')','Output shape: 284 timesteps × 8196 vertices','Evidence tags: observed, inferred, hypothesis'],
+          histMode:'DISCOVERY', histTime:stamp, histLine:a });
+      } else {
+        const a = 'Therapeutics SIMULATION complete.\nIterations: 12\nPayload: sim-payload-0042\nBaseline distance: 0.412\nFinal distance: 0.118\nImprovement: 71.4%';
+        this.setState({ processing:false, ran:true, mock:true, tagList:[], analysis:a,
+          remarks:'Simulation mode only.\n\nTarget baseline: ' + st.profile.toUpperCase() + ' / ' + st.cohort.toUpperCase() + '.',
+          resultFindings:['THERAPEUTICS SIMULATION completed','Target vectors: valence='+st.valence+', arousal='+st.arousal+', modality='+st.modality],
+          histMode:'THERAPEUTICS', histTime:stamp, histLine:'Therapeutics SIMULATION complete.' });
+      }
+    }, 1800);
+  };
+  renderVals() {
+    const st = this.state, c = this.modeColor(st.mode);
+    const ctrl = sel => ({ border:'1px solid '+(sel?'#06d6a0':'rgba(255,255,255,0.08)'), color:sel?'#06d6a0':'rgba(255,255,255,0.55)', bg:sel?'rgba(6,214,160,0.12)':'transparent', shadow:sel?'0 0 16px rgba(6,214,160,0.35), inset 0 0 12px rgba(6,214,160,0.05)':'none' });
+    const modeTabs = ['discovery','therapeutics','conditioning'].map(m => { const act = m===st.mode, mc = this.modeColor(m).p;
+      return { name:m, pick:()=>this.setState({mode:m}), color:act?mc:'rgba(255,255,255,0.45)', border:act?('2px solid '+mc):'2px solid transparent', shadow:act?('0 8px 14px -8px '+mc):'none' }; });
+    const TAGSTYLES = { observed:{c:'#22d3ee',sym:'◉'}, inferred:{c:'#a78bfa',sym:'◈'}, hypothesis:{c:'#fbbf24',sym:'◇'}, low_confidence:{c:'#f87171',sym:'⚠'} };
+    const tags = st.tagList.map(t => { const s = TAGSTYLES[t]; return { name:t.replace('_',' '), sym:s.sym, color:s.c, border:s.c.replace(')','').length ? this.rgba(s.c,0.3) : s.c, bg:this.rgba(s.c,0.08) }; });
+    const pending = ['Neural pathway correlation: pending','Dopamine receptor activation: pending','Prefrontal cortex engagement: pending'];
+    const findings = [...st.resultFindings, ...pending].slice(0,6).map(t => ({ text:t, dot: t.startsWith('ERROR')?'#f87171':'#06d6a0', dotGlow: t.startsWith('ERROR')?'rgba(248,113,113,0.4)':'rgba(6,214,160,0.35)' }));
+    const conns = this.CONNS.map(([a,b]) => ({ x1:this.NODES[a].cx, y1:this.NODES[a].cy, x2:this.NODES[b].cx, y2:this.NODES[b].cy }));
+    const nodes = this.NODES.map((n,i) => ({ ...n, fill: i===4?c.p:'transparent', sw: i===4?0.8:0.5, op: st.processing?0.8:(i===4?0.8:0.35) }));
+    return {
+      ...st, run:this.run, sessionId:this.sessionId, sessionTs:this.sessionTs,
+      isDiscovery: st.mode==='discovery', isTherapeutics: st.mode==='therapeutics', isConditioning: st.mode==='conditioning',
+      stimIsText: st.stim==='text', stimIsMedia: st.stim!=='text',
+      modeDescription: st.mode==='discovery' ? 'Submit multimodal stimuli to predict fMRI neural-response patterns with evidence-tagged analysis.' : st.mode==='therapeutics' ? 'Configure target emotional state vectors and generate optimized intervention simulations.' : 'Set the demographic profile baseline for all future prediction and generation runs.',
+      runLabel: st.mode==='conditioning' ? 'Apply Profile' : st.mode==='therapeutics' ? 'Run Simulation' : 'Run Discovery',
+      runOpacity: st.processing ? 0.5 : 1,
+      modeTabs, tags, hasTags: tags.length>0, findings, conns, nodes,
+      modeColor: c.p, modeGlow: c.g, glowOpacity: st.processing?0.5:0.15,
+      connOpacity: st.processing?0.28:0.12,
+      centerLabel: st.processing ? 'ACTIVE' : st.mode.toUpperCase(),
+      statusLabel: st.processing ? 'Processing' : 'Ready',
+      statusColor: st.processing ? c.p : 'rgba(255,255,255,0.7)',
+      modeUpper: st.mode.toUpperCase(),
+      hasRemarks: !!st.remarks,
+      stims: ['text','image','video','audio'].map(s => ({ name:s, pick:()=>this.setState({stim:s}), ...ctrl(s===st.stim) })),
+      modalities: ['audio','text','image','video'].map(s => ({ name:s, pick:()=>this.setState({modality:s}), ...ctrl(s===st.modality) })),
+      profiles: [{k:'neurotypical',d:'Standard baseline profile'},{k:'adhd',d:'Attention-divergent profile'},{k:'asd',d:'Autism spectrum profile'}].map(p => ({ name:p.k, desc:p.d, pick:()=>this.setState({profile:p.k}), ...ctrl(p.k===st.profile) })),
+      cohorts: ['youth','adult','elderly'].map(s => ({ name:s, pick:()=>this.setState({cohort:s}), ...ctrl(s===st.cohort) })),
+      setText: e=>this.setState({text:e.target.value}),
+      setValence: e=>this.setState({valence:Number(e.target.value)}),
+      setArousal: e=>this.setState({arousal:Number(e.target.value)}),
+      toggleSession: ()=>this.setState({openSession:!st.openSession}),
+      toggleDiag: ()=>this.setState({openDiag:!st.openDiag}),
+      toggleHistory: ()=>this.setState({openHistory:!st.openHistory}),
+      chevSession: st.openSession?'rotate(90deg)':'none', chevDiag: st.openDiag?'rotate(90deg)':'none', chevHistory: st.openHistory?'rotate(90deg)':'none'
+    };
+  }
+  rgba(hex, a){ const n = parseInt(hex.slice(1),16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+}
+</script>
+</body>
+</html>

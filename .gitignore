@@ -44,3 +44,6 @@ backend/.env*
 *.pem
 .env
 *.log
+
+# Design-tool export — the unpacked copy in frontend/design-dock/ is what we read.
+frontend/*.zip

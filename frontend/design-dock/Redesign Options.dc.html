@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/organic-9174a878-44ad-4c1c-853e-df3c27afab4b/styles.css">
+<style>
+body{margin:0;background:#f0eee9}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-700)}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 14px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+input[type=range]{width:100%;cursor:pointer}
+@keyframes om-indet{0%{left:-34%}100%{left:100%}}
+@keyframes om-twinkle{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.05);opacity:0.75}}
+</style>
+</helmet>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Eco redesign — three directions (same app, three temperatures)</span></div>
+<div style="max-width:860px;font:12.5px/1.6 system-ui,sans-serif;color:rgba(0,0,0,.6);margin:0 0 22px">
+Kept: all 3 modes, the honest evidence labels, the disclaimer, your logo. Changed: warm cream ground, Caprasimo + Figtree, pill shapes, plain-spoken copy, and a constellation motif — borrowed from your logo — instead of the neural net. <a class="dv-oid" href="#1a">1a</a> keeps your 3-panel layout and mode names. <a class="dv-oid" href="#1b">1b</a> rethinks it as numbered steps beside a big sky canvas, with friendlier mode names (Explore / Shape / Tune). <a class="dv-oid" href="#1c">1c</a> is the boldest: a centered field-journal flow. Tabs, chips, sliders and Run buttons all work — and the small idle / loading / results / error chips beside each option label let you preview every state (error included, since the real backend isn't attached here).
+</div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Softened dashboard — familiar layout, original names<span style="display:inline-flex;gap:4px;margin-left:8px"><sc-for list="{{ stateChips1 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:2px 8px;border-radius:5px;font-family:ui-monospace,monospace;font-size:10px;font-weight:600;border:none;cursor:pointer;background:{{ s.bg }};color:{{ s.color }}">{{ s.label }}</button></sc-for></span></div>
+<div class="dv-card" style="width:1360px">
+<div data-screen-label="1a Softened dashboard" style="background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+  <div style="display:flex;align-items:center;gap:14px;padding:14px 28px;border-bottom:1px solid var(--color-divider)">
+    <img src="frontend/public/magic-play-place-logo-black.png" alt="" style="width:34px;height:auto">
+    <span style="font-family:var(--font-heading);font-size:19px">Magic Play Place</span>
+    <span class="tag tag-accent-2">research, gently</span>
+    <div style="margin-left:auto;display:inline-flex;gap:4px;padding:4px;border:1px solid var(--color-divider);border-radius:999px">
+      <sc-for list="{{ tabs1 }}" as="m" hint-placeholder-count="3">
+        <button onClick="{{ m.pick }}" style="padding:7px 18px;border-radius:999px;font-family:var(--font-heading);font-size:13px;cursor:pointer;background:{{ m.bg }};color:{{ m.color }};border:none">{{ m.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:340px 1fr 400px;gap:26px;padding:26px 28px">
+    <div style="background:var(--color-surface);border-radius:32px;padding:24px;display:flex;flex-direction:column;gap:18px;align-self:start">
+      <div><h4 style="margin:0 0 6px">Set up a run</h4><p style="margin:0;font-size:13px" class="text-muted">{{ desc1 }}</p></div>
+      <sc-if value="{{ d1 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div><div style="font-size:12px;font-weight:600;margin-bottom:8px">What should we show it?</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ stims1 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:7px 16px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+            </div></div>
+          <sc-if value="{{ sIsText1 }}" hint-placeholder-val="{{ true }}">
+            <textarea class="input" placeholder="Describe something — 'a calm forest at dawn'…" style="min-height:110px;border-radius:20px;background:var(--color-neutral-100)"></textarea>
+          </sc-if>
+          <sc-if value="{{ sNotText1 }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1.5px dashed var(--color-accent-2-500);border-radius:20px;padding:26px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--color-accent-2-800)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span style="font-size:13px">Drop your file here, or browse</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{ t1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:12px;font-weight:600">Mood</span><span class="tag tag-accent">{{ v1 }}</span></div>
+            <input type="range" min="0" max="100" value="{{ v1 }}" onChange="{{ setV1 }}" style="accent-color:var(--color-accent)">
+            <div style="display:flex;justify-content:space-between;font-size:11px" class="text-muted"><span>low</span><span>bright</span></div></div>
+          <div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:12px;font-weight:600">Energy</span><span class="tag tag-accent">{{ a1 }}</span></div>
+            <input type="range" min="0" max="100" value="{{ a1 }}" onChange="{{ setA1 }}" style="accent-color:var(--color-accent)">
+            <div style="display:flex;justify-content:space-between;font-size:11px" class="text-muted"><span>calm</span><span>excited</span></div></div>
+          <div><div style="font-size:12px;font-weight:600;margin-bottom:8px">Deliver it as</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ mods1 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:7px 16px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+            </div></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ k1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div><div style="font-size:12px;font-weight:600;margin-bottom:8px">Who are we modelling?</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ profs1 }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}"><span>{{ s.label }}</span><span style="font-size:11px;opacity:0.65">{{ s.desc }}</span></button></sc-for>
+            </div></div>
+          <div><div style="font-size:12px;font-weight:600;margin-bottom:8px">Their age</div>
+            <div style="display:flex;gap:8px">
+              <sc-for list="{{ cohs1 }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="flex:1;padding:7px 12px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+            </div></div>
+        </div>
+      </sc-if>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px" class="text-muted">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-500)"></span>
+        modelling for {{ p1 }} · {{ c1 }}
+      </div>
+      <button onClick="{{ doRun1 }}" disabled="{{ loading1 }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 20px;border-radius:999px;border:none;cursor:pointer;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);font-size:15px;opacity:{{ runOp1 }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+        {{ run1 }}
+      </button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:10px 0">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+        <span class="tag {{ connCls1 }}" style="display:inline-flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:{{ connDot1 }}"></span>{{ connTxt1 }}</span>
+        <span class="tag tag-neutral">{{ p1 }} · {{ c1 }}</span>
+        <span class="tag {{ stCls1 }}">{{ stTxt1 }}</span>
+      </div>
+      <div style="width:350px;height:350px;border-radius:50%;background:var(--color-accent-2-100);display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 220 220" style="width:235px;height:235px;transform-origin:center;animation:{{ pulse1 }}">
+          <ellipse cx="110" cy="120" rx="94" ry="32" transform="rotate(-14 110 120)" fill="none" stroke="var(--color-accent-2-700)" stroke-width="4" stroke-linecap="round"></ellipse>
+          <path d="M0 -46 C4 -15 15 -4 46 0 C15 4 4 15 0 46 C-4 15 -15 4 -46 0 C-15 -4 -4 -15 0 -46 Z" transform="translate(110 106)" fill="var(--color-accent-2-500)"></path>
+          <path d="M0 -16 C1.5 -5 5 -1.5 16 0 C5 1.5 1.5 5 0 16 C-1.5 5 -5 1.5 -16 0 C-5 -1.5 -1.5 -5 0 -16 Z" transform="translate(58 48)" fill="var(--color-accent-400)"></path>
+          <path d="M0 -12 C1.2 -4 4 -1.2 12 0 C4 1.2 1.2 4 0 12 C-1.2 4 -4 1.2 -12 0 C-4 -1.2 -1.2 -4 0 -12 Z" transform="translate(164 62)" fill="var(--color-accent-2-400)"></path>
+          <path d="M0 -10 C1 -3.3 3.3 -1 10 0 C3.3 1 1 3.3 0 10 C-1 3.3 -3.3 1 -10 0 C-3.3 -1 -1 -3.3 0 -10 Z" transform="translate(160 164)" fill="var(--color-accent-300)"></path>
+          <circle cx="66" cy="156" r="3.5" fill="var(--color-accent-2-400)"></circle>
+          <circle cx="42" cy="98" r="3" fill="var(--color-accent-300)"></circle>
+          <circle cx="178" cy="112" r="3" fill="var(--color-accent-2-300)"></circle>
+        </svg>
+      </div>
+      <sc-if value="{{ loading1 }}" hint-placeholder-val="{{ false }}">
+        <div style="width:220px;height:4px;border-radius:2px;background:var(--color-neutral-200);overflow:hidden;position:relative"><div style="position:absolute;top:0;width:34%;height:100%;border-radius:2px;background:var(--color-accent-2-500);animation:om-indet 1.4s ease-in-out infinite"></div></div>
+      </sc-if>
+      <div style="font-size:14px;max-width:300px;text-align:center" class="text-muted">{{ caption1 }}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;align-self:start">
+      <div style="background:var(--color-surface);border-radius:28px;padding:20px 22px">
+        <h5 style="margin:0 0 8px">What we found</h5>
+        <sc-if value="{{ emptyish1 }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px" class="text-muted">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--color-accent-2-600)" style="flex-shrink:0;margin-top:1px"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+              <span>{{ foundEmpty1 }}</span>
+            </div>
+            <div style="margin-top:14px;font-size:11px" class="text-muted">How much to trust each finding:</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+              <span class="tag tag-accent-2">measured</span><span class="tag tag-accent">reasoned</span><span class="tag tag-neutral">a hunch</span><span class="tag tag-outline">take lightly</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ results1 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-family:var(--font-heading);font-size:16px;margin-bottom:6px">{{ resTitle1 }}</div>
+            <div style="font-size:13px;line-height:1.55" class="text-muted">{{ resBody1 }}</div>
+            <sc-if value="{{ resMock1 }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;background:var(--color-accent-200);color:var(--color-accent-900);border-radius:16px;padding:9px 14px;font-size:12px;display:flex;gap:8px;align-items:flex-start">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-top:1px"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+                <span>Heads up — this run used the mock model, so numbers are stand-ins.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ error1 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-size:13px;line-height:1.55">We couldn't reach the model — it's not you. The backend isn't answering.</div>
+            <div style="margin-top:10px;font-size:12px;font-weight:600">Things to try:</div>
+            <div style="font-size:12.5px;line-height:1.7" class="text-muted">· Check the backend is running<br>· Check the address in settings<br>· Wait a moment, then retry</div>
+            <button onClick="{{ retry1 }}" style="margin-top:12px;padding:8px 18px;border-radius:999px;border:1px solid var(--color-accent);background:transparent;color:var(--color-accent-700);font-size:13px;cursor:pointer;font-family:var(--font-body)">Try again</button>
+          </div>
+        </sc-if>
+      </div>
+      <div style="background:var(--color-surface);border-radius:28px;padding:20px 22px">
+        <h5 style="margin:0 0 10px">Watching for</h5>
+        <sc-if value="{{ results1 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:13px">
+            <sc-for list="{{ resF1 }}" as="f" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-600);flex-shrink:0"></span><span style="flex:1">{{ f.t }}</span><span class="tag {{ f.cls }}">{{ f.tag }}</span></div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ notResults1 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:13px">
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Pathway correlations <span class="text-muted" style="margin-left:auto;font-size:11px">waiting</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Receptor activity <span class="text-muted" style="margin-left:auto;font-size:11px">waiting</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Cortex engagement <span class="text-muted" style="margin-left:auto;font-size:11px">waiting</span></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="background:var(--color-accent-100);color:var(--color-accent-800);border-radius:20px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:12.5px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+        Research only — never medical advice.
+      </div>
+      <button style="display:flex;align-items:center;justify-content:space-between;background:transparent;border:1px solid var(--color-divider);border-radius:999px;padding:9px 18px;font-size:12px;cursor:pointer;color:var(--color-text);font-family:var(--font-body)">
+        <span>Under the hood — session, backend, request IDs</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div style="font-size:11px;text-align:center" class="text-muted">session GRN-7Q2K4 · started 08:19 · mock model</div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--color-divider);padding:10px 28px;font-size:11px;text-align:center" class="text-muted">© 2026 Magic Play Place · grown by Vlive Capital (Pty) Ltd</div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Observatory workbench — numbered steps + big sky canvas, friendly names<span style="display:inline-flex;gap:4px;margin-left:8px"><sc-for list="{{ stateChips2 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:2px 8px;border-radius:5px;font-family:ui-monospace,monospace;font-size:10px;font-weight:600;border:none;cursor:pointer;background:{{ s.bg }};color:{{ s.color }}">{{ s.label }}</button></sc-for></span></div>
+<div class="dv-card" style="width:1360px">
+<div data-screen-label="1b Observatory workbench" style="background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+  <div style="display:flex;align-items:center;gap:12px;padding:16px 30px">
+    <img src="frontend/public/magic-play-place-logo-black.png" alt="" style="width:34px;height:auto">
+    <span style="font-family:var(--font-heading);font-size:19px">Magic Play Place</span>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px" class="text-muted">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-500)"></span>
+      all systems calm · <a href="#1b" style="color:var(--color-accent-700)">under the hood</a>
+    </div>
+  </div>
+  <div style="padding:6px 30px 20px">
+    <h2 style="margin:0 0 10px;font-size:31px">What shall we explore today?</h2>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px">
+        <sc-for list="{{ tabs2 }}" as="m" hint-placeholder-count="3">
+          <button onClick="{{ m.pick }}" style="padding:8px 20px;border-radius:999px;font-family:var(--font-heading);font-size:14px;cursor:pointer;background:{{ m.bg }};color:{{ m.color }};border:{{ m.border }}">{{ m.label }}</button>
+        </sc-for>
+      </div>
+      <p style="margin:0;font-size:13.5px;max-width:520px" class="text-muted">{{ desc2 }}</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:430px 1fr;gap:26px;padding:0 30px 26px">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <sc-if value="{{ d2 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;gap:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">1</div>
+            <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Pick a stimulus</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <sc-for list="{{ stims2 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:7px 16px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+              </div></div>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">2</div>
+            <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Describe it</div>
+              <sc-if value="{{ sIsText2 }}" hint-placeholder-val="{{ true }}">
+                <textarea class="input" placeholder="Try 'a calm forest at dawn'…" style="min-height:104px;border-radius:20px;background:var(--color-neutral-100)"></textarea>
+              </sc-if>
+              <sc-if value="{{ sNotText2 }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1.5px dashed var(--color-accent-2-500);border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--color-accent-2-800)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span style="font-size:13px">Drop your file here, or browse</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ t2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;gap:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">1</div>
+            <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Aim for a feeling</div>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600">Mood</span><span class="tag tag-accent-2">{{ v2 }}</span></div>
+                  <input type="range" min="0" max="100" value="{{ v2 }}" onChange="{{ setV2 }}" style="accent-color:var(--color-accent-2-600)">
+                  <div style="display:flex;justify-content:space-between;font-size:11px" class="text-muted"><span>low</span><span>bright</span></div></div>
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600">Energy</span><span class="tag tag-accent-2">{{ a2 }}</span></div>
+                  <input type="range" min="0" max="100" value="{{ a2 }}" onChange="{{ setA2 }}" style="accent-color:var(--color-accent-2-600)">
+                  <div style="display:flex;justify-content:space-between;font-size:11px" class="text-muted"><span>calm</span><span>excited</span></div></div>
+              </div></div>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">2</div>
+            <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Deliver it as</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <sc-for list="{{ mods2 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:7px 16px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+              </div></div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ k2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;gap:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">1</div>
+            <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Who is this for?</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ profs2 }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}"><span>{{ s.label }}</span><span style="font-size:11px;opacity:0.65">{{ s.desc }}</span></button></sc-for>
+              </div></div>
+          </div>
+          <div style="display:flex;gap:14px">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">2</div>
+            <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Their age</div>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ cohs2 }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="flex:1;padding:7px 12px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+              </div></div>
+          </div>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">3</div>
+        <button onClick="{{ doRun2 }}" disabled="{{ loading2 }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;border:none;cursor:pointer;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);font-size:15px;opacity:{{ runOp2 }}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+          {{ run2 }}
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--color-accent-100);color:var(--color-accent-800);border-radius:20px;padding:11px 16px;font-size:12.5px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+        Research only — never medical advice.
+      </div>
+    </div>
+    <div style="position:relative;border-radius:36px;background:var(--color-accent-2-100);min-height:520px;overflow:hidden">
+      <div style="position:absolute;top:20px;left:26px;font-size:12px;color:var(--color-accent-2-800);display:flex;align-items:center;gap:8px">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-600)"></span>
+        {{ statusWord2 }} · Tribe v2 · modelling for {{ p2 }} ({{ c2 }})
+      </div>
+      <div style="position:absolute;top:38%;left:0;right:0;text-align:center;padding:0 40px">
+        <div style="font-family:var(--font-heading);font-size:22px;color:var(--color-accent-2-900)">{{ canvasTitle2 }}</div>
+        <div style="font-size:13.5px;color:var(--color-accent-2-800);opacity:0.75;margin-top:6px">{{ canvasSub2 }}</div>
+        <sc-if value="{{ loading2 }}" hint-placeholder-val="{{ false }}">
+          <div style="width:220px;height:4px;border-radius:2px;background:var(--color-accent-2-200);overflow:hidden;position:relative;margin:14px auto 0"><div style="position:absolute;top:0;width:34%;height:100%;border-radius:2px;background:var(--color-accent-2-600);animation:om-indet 1.4s ease-in-out infinite"></div></div>
+        </sc-if>
+        <sc-if value="{{ error2 }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ retry2 }}" style="margin-top:14px;padding:8px 20px;border-radius:999px;border:1px solid var(--color-accent-2-700);background:transparent;color:var(--color-accent-2-900);font-size:13px;cursor:pointer;font-family:var(--font-body)">Try again</button>
+        </sc-if>
+      </div>
+      <svg viewBox="0 0 320 230" style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:360px;height:259px">
+        <ellipse cx="160" cy="118" rx="140" ry="42" transform="rotate(-12 160 118)" fill="none" stroke="var(--color-accent-2-600)" stroke-width="4" stroke-linecap="round"></ellipse>
+        <path d="M0 -52 C4.5 -17 17 -4.5 52 0 C17 4.5 4.5 17 0 52 C-4.5 17 -17 4.5 -52 0 C-17 -4.5 -4.5 -17 0 -52 Z" transform="translate(160 104)" fill="var(--color-accent-2-500)"></path>
+        <path d="M0 -18 C1.7 -5.6 5.6 -1.7 18 0 C5.6 1.7 1.7 5.6 0 18 C-1.7 5.6 -5.6 1.7 -18 0 C-5.6 -1.7 -1.7 -5.6 0 -18 Z" transform="translate(84 42)" fill="var(--color-accent-400)"></path>
+        <path d="M0 -13 C1.3 -4.2 4.2 -1.3 13 0 C4.2 1.3 1.3 4.2 0 13 C-1.3 4.2 -4.2 1.3 -13 0 C-4.2 -1.3 -1.3 -4.2 0 -13 Z" transform="translate(240 56)" fill="var(--color-accent-2-400)"></path>
+        <path d="M0 -11 C1.1 -3.6 3.6 -1.1 11 0 C3.6 1.1 1.1 3.6 0 11 C-1.1 3.6 -3.6 1.1 -11 0 C-3.6 -1.1 -1.1 -3.6 0 -11 Z" transform="translate(236 172)" fill="var(--color-accent-300)"></path>
+        <circle cx="96" cy="172" r="4" fill="var(--color-accent-2-400)"></circle>
+        <circle cx="52" cy="112" r="3.5" fill="var(--color-accent-300)"></circle>
+        <circle cx="272" cy="118" r="3.5" fill="var(--color-accent-2-300)"></circle>
+      </svg>
+      <svg viewBox="0 0 24 24" style="position:absolute;bottom:64px;left:11%;width:26px;height:26px;opacity:0.45" fill="var(--color-accent-2-500)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+      <svg viewBox="0 0 24 24" style="position:absolute;top:24%;right:13%;width:20px;height:20px;opacity:0.4" fill="var(--color-accent-400)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+    </div>
+  </div>
+  <div style="padding:0 30px 26px">
+    <h5 style="margin:0 0 12px">Fresh sightings</h5>
+    <sc-if value="{{ results2 }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+          <sc-for list="{{ resF2 }}" as="f" hint-placeholder-count="3">
+            <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-600);flex-shrink:0"></span><span style="flex:1">{{ f.t }}</span><span class="tag {{ f.cls }}">{{ f.tag }}</span></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ resMock2 }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;display:inline-flex;gap:8px;align-items:center;background:var(--color-accent-200);color:var(--color-accent-900);border-radius:16px;padding:8px 14px;font-size:12px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+            Heads up — this run used the mock model, so numbers are stand-ins.
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{ error2 }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--color-accent-100);color:var(--color-accent-800);border-radius:24px;padding:16px 20px;display:flex;align-items:center;gap:12px;font-size:13px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+        <span style="flex:1">We couldn't reach the model — check the backend is running and the address in settings, then try again.</span>
+        <button onClick="{{ retry2 }}" style="padding:8px 18px;border-radius:999px;border:1px solid var(--color-accent);background:transparent;color:var(--color-accent-700);font-size:13px;cursor:pointer;font-family:var(--font-body);flex-shrink:0">Try again</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ emptyish2 }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr) auto;gap:14px;align-items:stretch">
+        <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Pathway correlations<span class="tag tag-neutral" style="margin-left:auto">waiting</span></div>
+        <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Receptor activity<span class="tag tag-neutral" style="margin-left:auto">waiting</span></div>
+        <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Cortex engagement<span class="tag tag-neutral" style="margin-left:auto">waiting</span></div>
+        <div style="display:flex;flex-direction:column;justify-content:center;gap:5px;padding:0 6px">
+          <span style="font-size:11px" class="text-muted">trust labels:</span>
+          <div style="display:flex;gap:5px"><span class="tag tag-accent-2">measured</span><span class="tag tag-accent">reasoned</span><span class="tag tag-neutral">a hunch</span></div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="border-top:1px solid var(--color-divider);padding:10px 30px;font-size:11px;display:flex;justify-content:space-between" class="text-muted"><span>© 2026 Magic Play Place · grown by Vlive Capital</span><span>session GRN-7Q2K4 · mock model</span></div>
+</div>
+</div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Star journal — centered editorial flow, boldest rethink<span style="display:inline-flex;gap:4px;margin-left:8px"><sc-for list="{{ stateChips3 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:2px 8px;border-radius:5px;font-family:ui-monospace,monospace;font-size:10px;font-weight:600;border:none;cursor:pointer;background:{{ s.bg }};color:{{ s.color }}">{{ s.label }}</button></sc-for></span></div>
+<div class="dv-card" style="width:1360px">
+<div data-screen-label="1c Star journal" style="background:var(--color-bg);font-family:var(--font-body);color:var(--color-text);padding-bottom:26px">
+  <div style="display:flex;align-items:center;gap:12px;padding:18px 34px">
+    <img src="frontend/public/magic-play-place-logo-black.png" alt="" style="width:32px;height:auto">
+    <span style="font-family:var(--font-heading);font-size:18px">Magic Play Place</span>
+    <div style="margin-left:auto;display:flex;gap:22px">
+      <sc-for list="{{ tabs3 }}" as="m" hint-placeholder-count="3">
+        <button onClick="{{ m.pick }}" style="background:transparent;border:none;cursor:pointer;font-family:var(--font-body);font-size:14px;padding:4px 2px;color:{{ m.tColor }};border-bottom:{{ m.tLine }};font-weight:{{ m.tWeight }}">{{ m.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+  <div style="max-width:760px;margin:26px auto 0;text-align:center;padding:0 20px">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-accent-2-600)" style="display:inline-block"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+    <h1 style="margin:10px 0 8px;font-size:40px">{{ head3 }}</h1>
+    <p style="margin:0 auto;font-size:15px;max-width:540px" class="text-muted">{{ desc3 }}</p>
+  </div>
+  <div style="max-width:720px;margin:26px auto 0;background:var(--color-surface);border-radius:36px;padding:26px 28px;box-shadow:var(--shadow-sm)">
+    <sc-if value="{{ d3 }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ stims3 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:7px 18px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+        </div>
+        <sc-if value="{{ sIsText3 }}" hint-placeholder-val="{{ true }}">
+          <textarea class="input" placeholder="Describe something — 'a calm forest at dawn', 'a crowded train', 'my favourite song'…" style="min-height:120px;border-radius:24px;background:var(--color-neutral-100);font-size:15px;padding:16px 18px"></textarea>
+        </sc-if>
+        <sc-if value="{{ sNotText3 }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1.5px dashed var(--color-accent-2-500);border-radius:24px;padding:34px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--color-accent-2-800)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span style="font-size:14px">Drop your file here, or browse</span>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{ t3 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Mood</span><span class="tag tag-neutral">{{ v3 }}</span></div>
+            <input type="range" min="0" max="100" value="{{ v3 }}" onChange="{{ setV3 }}" style="accent-color:var(--color-neutral-900)">
+            <div style="display:flex;justify-content:space-between;font-size:11px" class="text-muted"><span>low</span><span>bright</span></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Energy</span><span class="tag tag-neutral">{{ a3 }}</span></div>
+            <input type="range" min="0" max="100" value="{{ a3 }}" onChange="{{ setA3 }}" style="accent-color:var(--color-neutral-900)">
+            <div style="display:flex;justify-content:space-between;font-size:11px" class="text-muted"><span>calm</span><span>excited</span></div></div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ mods3 }}" as="s" hint-placeholder-count="4"><button onClick="{{ s.pick }}" style="padding:7px 18px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ k3 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ profs3 }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="padding:8px 18px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }} <span style="font-size:11px;opacity:0.65">· {{ s.desc }}</span></button></sc-for>
+        </div>
+        <div style="display:flex;justify-content:center;gap:8px">
+          <sc-for list="{{ cohs3 }}" as="s" hint-placeholder-count="3"><button onClick="{{ s.pick }}" style="padding:7px 18px;border-radius:999px;font-size:13px;cursor:pointer;background:{{ s.bg }};color:{{ s.color }};border:{{ s.border }}">{{ s.label }}</button></sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px">
+      <span style="font-size:12px" class="text-muted">modelling for {{ p3 }} · {{ c3 }} · Tribe v2</span>
+      <button onClick="{{ doRun3 }}" disabled="{{ loading3 }}" style="display:flex;align-items:center;gap:8px;padding:11px 24px;border-radius:999px;border:none;cursor:pointer;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);font-size:15px;opacity:{{ runOp3 }}">
+        {{ run3 }}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+      </button>
+    </div>
+  </div>
+  <div style="max-width:720px;margin:30px auto 0;display:flex;align-items:center;gap:16px">
+    <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--color-accent-2-500)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+    <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+  </div>
+  <div style="max-width:720px;margin:24px auto 0;padding:0 4px">
+    <h3 style="margin:0 0 4px;font-size:24px">Observations</h3>
+    <p style="margin:0 0 16px;font-size:13px" class="text-muted">Every run adds an observation here, labelled with how much to trust it.</p>
+    <sc-if value="{{ emptyish3 }}" hint-placeholder-val="{{ true }}">
+      <div style="border:1.5px dashed var(--color-divider);border-radius:28px;padding:28px;text-align:center">
+        <div style="font-size:14px" class="text-muted">{{ obsEmpty3 }}</div>
+        <sc-if value="{{ loading3 }}" hint-placeholder-val="{{ false }}">
+          <div style="width:200px;height:4px;border-radius:2px;background:var(--color-neutral-200);overflow:hidden;position:relative;margin:14px auto 0"><div style="position:absolute;top:0;width:34%;height:100%;border-radius:2px;background:var(--color-accent-2-500);animation:om-indet 1.4s ease-in-out infinite"></div></div>
+        </sc-if>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:12px">
+          <span class="tag tag-accent-2">measured</span><span class="tag tag-accent">reasoned</span><span class="tag tag-neutral">a hunch</span><span class="tag tag-outline">take lightly</span>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ results3 }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--color-surface);border-radius:28px;padding:20px 24px;box-shadow:var(--shadow-sm)">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:var(--font-heading);font-size:17px">{{ resTitle3 }}</span><span style="font-size:11px;margin-left:auto" class="text-muted">today · just now</span></div>
+        <p style="margin:8px 0 10px;font-size:13.5px;line-height:1.55" class="text-muted">{{ resBody3 }}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ resF3 }}" as="f" hint-placeholder-count="3"><span class="tag {{ f.cls }}">{{ f.t }}</span></sc-for>
+        </div>
+        <sc-if value="{{ resMock3 }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px;display:inline-flex;gap:8px;align-items:center;background:var(--color-accent-200);color:var(--color-accent-900);border-radius:16px;padding:8px 14px;font-size:12px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+            Heads up — this run used the mock model, so numbers are stand-ins.
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{ error3 }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--color-accent-100);color:var(--color-accent-800);border-radius:28px;padding:22px 24px;text-align:center">
+        <div style="font-size:14px">We couldn't reach the model — it's not you. Check the backend is running, then try again.</div>
+        <button onClick="{{ retry3 }}" style="margin-top:12px;padding:8px 20px;border-radius:999px;border:1px solid var(--color-accent);background:transparent;color:var(--color-accent-700);font-size:13px;cursor:pointer;font-family:var(--font-body)">Try again</button>
+      </div>
+    </sc-if>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;font-size:12px" class="text-muted">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-accent-700)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+      Research only — never medical advice · © 2026 Magic Play Place · session GRN-7Q2K4
+    </div>
+  </div>
+</div>
+</div></div>
+
+</div>
+<p class="dv-next">Try next: "build out <a class="dv-oid" href="#1b">1b</a> as the full app" · "the layout of <a class="dv-oid" href="#1a">1a</a> with the big heading from <a class="dv-oid" href="#1b">1b</a>" · "show the results state after a run"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { m1:'discovery', s1:'text', o1:'sound', p1:'neurotypical', c1:'adult', v1:60, a1:35,
+            m2:'discovery', s2:'text', o2:'sound', p2:'neurotypical', c2:'adult', v2:60, a2:35,
+            m3:'discovery', s3:'text', o3:'sound', p3:'neurotypical', c3:'adult', v3:60, a3:35,
+            st1:'idle', st2:'idle', st3:'idle', res1:null, res2:null, res3:null };
+  chips(list, key, cur, pal){ return list.map(it => { const val = typeof it === 'string' ? it : it.k, label = typeof it === 'string' ? it : it.l, sel = val === cur;
+    return { label, desc: it.d || '', pick: () => this.setState({ [key]: val }),
+      bg: sel ? pal.bg : 'transparent', color: sel ? pal.fg : 'var(--color-text)', border: sel ? '1px solid transparent' : '1px solid var(--color-divider)' }; }); }
+  buildRes(n){ const s = this.state, m = s['m'+n], p = s['p'+n], c = s['c'+n], v = s['v'+n], a = s['a'+n];
+    if (m === 'therapeutics') return { mock:true, title:'Simulation finished', body:'We simulated a sound-based intervention nudging toward mood '+v+' and energy '+a+'. It got about 71% of the way to the target in 12 gentle steps.',
+      finds:[{t:'12 iterations, all labelled',tag:'measured',cls:'tag-accent-2'},{t:'71% closer to the target feeling',tag:'measured',cls:'tag-accent-2'},{t:'Sound suits this profile',tag:'a hunch',cls:'tag-neutral'}] };
+    if (m === 'conditioning') return { mock:false, title:'Profile saved', body:'Done. Every run from now on models a '+p+' '+c+'.',
+      finds:[{t:'Baseline updated',tag:'measured',cls:'tag-accent-2'},{t:'Modelling for '+p+' · '+c,tag:'measured',cls:'tag-accent-2'}] };
+    return { mock:true, title:'A calm, steady response', body:'The model predicts a gentle response — strongest in areas tied to attention and imagery. Confident overall; treat the details as early hints.',
+      finds:[{t:'284 timesteps × 8196 vertices',tag:'measured',cls:'tag-accent-2'},{t:'Attention and imagery areas lead',tag:'reasoned',cls:'tag-accent'},{t:'Soft audio may deepen it',tag:'a hunch',cls:'tag-neutral'}] };
+  }
+  finish(n){ this.setState({ ['st'+n]:'results', ['res'+n]:this.buildRes(n) }); }
+  doRun(n){ clearTimeout(this['_t'+n]);
+    if (this.state['m'+n] === 'conditioning') { this.finish(n); return; }
+    this.setState({ ['st'+n]:'loading' });
+    this['_t'+n] = setTimeout(() => this.finish(n), 1600); }
+  componentWillUnmount(){ [1,2,3].forEach(n => clearTimeout(this['_t'+n])); }
+  renderVals(){
+    const st = this.state, out = {};
+    const PALS = { 1:{bg:'var(--color-accent)',fg:'#f5ead8'}, 2:{bg:'var(--color-accent-2-700)',fg:'#f0fae1'}, 3:{bg:'#2e2b25',fg:'#f5ead8'} };
+    const MODES = { 1:[['discovery','Discovery'],['therapeutics','Therapeutics'],['conditioning','Conditioning']],
+                    2:[['discovery','Explore'],['therapeutics','Shape'],['conditioning','Tune']],
+                    3:[['discovery','Explore'],['therapeutics','Shape'],['conditioning','Tune']] };
+    const DESC = { discovery:'Show the model a sentence, a picture, a clip or a sound — it predicts how a brain might respond, and tells you how sure it is.',
+                   therapeutics:'Pick a feeling to aim for. We simulate an intervention that gently nudges toward it — simulation only, always labelled.',
+                   conditioning:'Tell us who we are modelling for. Every future run starts from this profile.' };
+    const RUN = { 1:{discovery:'Run discovery',therapeutics:'Run simulation',conditioning:'Apply profile'},
+                  2:{discovery:'Run it',therapeutics:'Simulate it',conditioning:'Save profile'},
+                  3:{discovery:'See what lights up',therapeutics:'Simulate it',conditioning:'Save profile'} };
+    const HEAD3 = { discovery:'Ask the model something.', therapeutics:'Aim for a feeling.', conditioning:'Who are we modelling?' };
+    const STIMS = { 1:['text','image','video','audio'],
+                    2:[{k:'text',l:'words'},{k:'image',l:'a picture'},{k:'video',l:'a clip'},{k:'audio',l:'a sound'}] };
+    const MODS = [{k:'sound',l:'sound'},{k:'words',l:'words'},{k:'picture',l:'a picture'},{k:'video',l:'video'}];
+    const PROFS = [{k:'neurotypical',l:'Neurotypical',d:'the standard baseline'},{k:'adhd',l:'ADHD',d:'attention-divergent'},{k:'asd',l:'Autistic',d:'autism spectrum'}];
+    const COHS = [{k:'youth',l:'young'},{k:'adult',l:'adult'},{k:'elderly',l:'older'}];
+    for (const n of [1,2,3]) {
+      const m = st['m'+n], pal = PALS[n], stt = st['st'+n];
+      out['tabs'+n] = MODES[n].map(([k,l]) => { const sel = k === m;
+        return { label:l, pick:()=>this.setState({['m'+n]:k}),
+          bg: sel ? pal.bg : 'transparent', color: sel ? pal.fg : 'var(--color-text)', border: sel ? '1px solid transparent' : '1px solid var(--color-divider)',
+          tColor: sel ? 'var(--color-accent-700)' : 'color-mix(in srgb, var(--color-text) 55%, transparent)',
+          tLine: sel ? '2px solid var(--color-accent)' : '2px solid transparent', tWeight: sel ? 600 : 400 }; });
+      out['d'+n] = m === 'discovery'; out['t'+n] = m === 'therapeutics'; out['k'+n] = m === 'conditioning';
+      out['desc'+n] = DESC[m];
+      out['run'+n] = stt === 'loading' ? (n === 3 ? 'Watching the sky…' : 'Running…') : RUN[n][m];
+      out['stims'+n] = this.chips(STIMS[n] || STIMS[2], 's'+n, st['s'+n], pal);
+      out['mods'+n] = this.chips(MODS, 'o'+n, st['o'+n], pal);
+      out['profs'+n] = this.chips(PROFS, 'p'+n, st['p'+n], pal);
+      out['cohs'+n] = this.chips(COHS, 'c'+n, st['c'+n], pal);
+      out['sIsText'+n] = st['s'+n] === 'text'; out['sNotText'+n] = st['s'+n] !== 'text';
+      out['v'+n] = st['v'+n]; out['a'+n] = st['a'+n];
+      out['setV'+n] = e => this.setState({ ['v'+n]: Number(e.target.value) });
+      out['setA'+n] = e => this.setState({ ['a'+n]: Number(e.target.value) });
+      out['p'+n] = st['p'+n]; out['c'+n] = st['c'+n];
+      out['idle'+n] = stt === 'idle'; out['loading'+n] = stt === 'loading';
+      out['results'+n] = stt === 'results'; out['error'+n] = stt === 'error';
+      out['notResults'+n] = stt !== 'results'; out['emptyish'+n] = stt === 'idle' || stt === 'loading';
+      out['runOp'+n] = stt === 'loading' ? 0.55 : 1;
+      out['doRun'+n] = () => this.doRun(n);
+      out['retry'+n] = () => { clearTimeout(this['_t'+n]); this.setState({ ['st'+n]:'loading' }); this['_t'+n] = setTimeout(() => this.finish(n), 1500); };
+      const res = st['res'+n] || {};
+      out['resTitle'+n] = res.title || ''; out['resBody'+n] = res.body || '';
+      out['resF'+n] = res.finds || []; out['resMock'+n] = !!res.mock;
+      out['stTxt'+n] = stt === 'loading' ? 'thinking…' : stt === 'results' ? 'done' : stt === 'error' ? 'offline' : 'ready';
+      out['stCls'+n] = stt === 'results' ? 'tag-accent-2' : stt === 'idle' ? 'tag-outline' : 'tag-accent';
+      out['statusWord'+n] = out['stTxt'+n];
+      out['pulse'+n] = stt === 'loading' ? 'om-twinkle 1.4s ease-in-out infinite' : 'none';
+      out['caption'+n] = stt === 'loading' ? 'Listening to the model…' : stt === 'results' ? 'Done — fresh findings on the right.' : stt === 'error' ? 'We couldn’t reach the model. Details on the right.' : 'Ready when you are — results appear on the right.';
+      out['foundEmpty'+n] = stt === 'loading' ? 'Listening to the model…' : 'Nothing yet — run something and results will light up here.';
+      out['canvasTitle'+n] = stt === 'loading' ? 'Reading the stars…' : stt === 'results' ? 'Done — see fresh sightings below.' : stt === 'error' ? 'We can’t reach the model right now.' : 'Your results will appear here, star by star.';
+      out['canvasSub'+n] = stt === 'loading' ? 'This usually takes a moment.' : stt === 'results' ? 'Each sighting is labelled with how much to trust it.' : stt === 'error' ? 'It’s not you — the backend isn’t answering.' : 'Run something on the left to add the first star.';
+      out['obsEmpty'+n] = stt === 'loading' ? 'Charting…' : 'Your first observation will appear here after a run.';
+      out['connTxt'+n] = stt === 'error' ? 'Tribe v2 · unreachable' : 'Tribe v2 · connected';
+      out['connCls'+n] = stt === 'error' ? 'tag-accent' : 'tag-accent-2';
+      out['connDot'+n] = stt === 'error' ? 'var(--color-accent-600)' : 'var(--color-accent-2-600)';
+      out['stateChips'+n] = ['idle','loading','results','error'].map(sname => ({ label:sname,
+        pick: () => { clearTimeout(this['_t'+n]); if (sname === 'results') { this.finish(n); } else { this.setState({ ['st'+n]:sname }); } },
+        bg: sname === stt ? '#1a1a1a' : 'rgba(0,0,0,.08)', color: sname === stt ? '#fff' : '#1a1a1a' }));
+    }
+    out.head3 = HEAD3[st.m3];
+    return out;
+  }
+}
+</script>
+</body>
+</html>

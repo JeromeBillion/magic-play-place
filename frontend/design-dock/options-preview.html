@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magic Play Place — three redesign directions</title>
+<link rel="stylesheet" href="_ds/organic-9174a878-44ad-4c1c-853e-df3c27afab4b/styles.css">
+<style>
+  body { margin:0; background:#e9e5dd; font-family: var(--font-body); }
+  .pv-bar {
+    position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:18px;
+    padding:12px 22px; background:#fffdf9; border-bottom:1px solid rgba(0,0,0,.1);
+    font-size:13px;
+  }
+  .pv-bar strong { font-family: var(--font-heading); font-weight:400; font-size:15px; margin-right:auto; }
+  .pv-bar a { text-decoration:none; padding:5px 14px; border-radius:999px; background:rgba(0,0,0,.06); color:#1a1a1a; }
+  .pv-bar a:hover { background:var(--color-accent); color:#fff; }
+  .pv-sec { padding:30px 22px 10px; }
+  .pv-head { max-width:1360px; margin:0 auto 14px; }
+  .pv-id {
+    display:inline-block; font:600 11px ui-monospace,Menlo,monospace; padding:3px 8px;
+    background:#1a1a1a; color:#fff; border-radius:5px; margin-right:10px;
+  }
+  .pv-name { font-family:var(--font-heading); font-size:20px; }
+  .pv-note { font-size:13px; color:rgba(0,0,0,.6); max-width:760px; margin:8px 0 0; line-height:1.55; }
+  /* Each screen is drawn at its native 1360px and scaled down to fit. */
+  .pv-frame { max-width:1360px; margin:0 auto; overflow:hidden; border-radius:10px;
+              border:1px solid rgba(0,0,0,.12); box-shadow:0 2px 14px rgba(0,0,0,.10); background:#fff; }
+  .pv-scale { width:1360px; transform-origin:top left; }
+</style>
+</head>
+<body>
+
+<div class="pv-bar">
+  <strong>Magic Play Place — three redesign directions</strong>
+  <span style="color:rgba(0,0,0,.5)">jump to</span>
+  <a href="#a">1a</a><a href="#b">1b</a><a href="#c">1c</a>
+</div>
+
+<!-- ═══════════════════════════ 1a ═══════════════════════════ -->
+<section class="pv-sec" id="a">
+  <div class="pv-head">
+    <span class="pv-id">1a</span><span class="pv-name">Softened dashboard</span>
+    <p class="pv-note">Keeps your current three-panel layout and the original mode names, restyled onto the Organic system. Lowest-risk: everything sits where it does today, and the diagnostics stay visible in the right rail.</p>
+  </div>
+  <div class="pv-frame"><div class="pv-scale">
+  <div style="background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 28px;border-bottom:1px solid var(--color-divider)">
+      <img src="frontend/public/magic-play-place-logo-black.png" alt="" style="width:34px;height:auto">
+      <span style="font-family:var(--font-heading);font-size:19px">Magic Play Place</span>
+      <span class="tag tag-accent-2">research, gently</span>
+      <div style="margin-left:auto;display:inline-flex;gap:4px;padding:4px;border:1px solid var(--color-divider);border-radius:999px">
+        <button style="padding:7px 18px;border-radius:999px;font-family:var(--font-heading);font-size:13px;background:var(--color-accent);color:#f5ead8;border:none">Discovery</button>
+        <button style="padding:7px 18px;border-radius:999px;font-family:var(--font-heading);font-size:13px;background:transparent;color:var(--color-text);border:none">Therapeutics</button>
+        <button style="padding:7px 18px;border-radius:999px;font-family:var(--font-heading);font-size:13px;background:transparent;color:var(--color-text);border:none">Conditioning</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:340px 1fr 400px;gap:26px;padding:26px 28px">
+      <div style="background:var(--color-surface);border-radius:32px;padding:24px;display:flex;flex-direction:column;gap:18px;align-self:start">
+        <div><h4 style="margin:0 0 6px">Set up a run</h4><p style="margin:0;font-size:13px" class="text-muted">Show the model a sentence, a picture, a clip or a sound — it predicts how a brain might respond, and tells you how sure it is.</p></div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div><div style="font-size:12px;font-weight:600;margin-bottom:8px">What should we show it?</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:var(--color-accent);color:#f5ead8;border:1px solid transparent">text</button>
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">image</button>
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">video</button>
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">audio</button>
+            </div></div>
+          <textarea class="input" placeholder="Describe something — 'a calm forest at dawn'…" style="min-height:110px;border-radius:20px;background:var(--color-neutral-100)"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px" class="text-muted">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-500)"></span>
+          modelling for neurotypical · adult
+        </div>
+        <button style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 20px;border-radius:999px;border:none;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);font-size:15px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+          Run discovery
+        </button>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:10px 0">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <span class="tag tag-accent-2" style="display:inline-flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:var(--color-accent-2-600)"></span>Tribe v2 · connected</span>
+          <span class="tag tag-neutral">neurotypical · adult</span>
+          <span class="tag tag-outline">ready</span>
+        </div>
+        <div style="width:350px;height:350px;border-radius:50%;background:var(--color-accent-2-100);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 220 220" style="width:235px;height:235px">
+            <ellipse cx="110" cy="120" rx="94" ry="32" transform="rotate(-14 110 120)" fill="none" stroke="var(--color-accent-2-700)" stroke-width="4" stroke-linecap="round"></ellipse>
+            <path d="M0 -46 C4 -15 15 -4 46 0 C15 4 4 15 0 46 C-4 15 -15 4 -46 0 C-15 -4 -4 -15 0 -46 Z" transform="translate(110 106)" fill="var(--color-accent-2-500)"></path>
+            <path d="M0 -16 C1.5 -5 5 -1.5 16 0 C5 1.5 1.5 5 0 16 C-1.5 5 -5 1.5 -16 0 C-5 -1.5 -1.5 -5 0 -16 Z" transform="translate(58 48)" fill="var(--color-accent-400)"></path>
+            <path d="M0 -12 C1.2 -4 4 -1.2 12 0 C4 1.2 1.2 4 0 12 C-1.2 4 -4 1.2 -12 0 C-4 -1.2 -1.2 -4 0 -12 Z" transform="translate(164 62)" fill="var(--color-accent-2-400)"></path>
+            <path d="M0 -10 C1 -3.3 3.3 -1 10 0 C3.3 1 1 3.3 0 10 C-1 3.3 -3.3 1 -10 0 C-3.3 -1 -1 -3.3 0 -10 Z" transform="translate(160 164)" fill="var(--color-accent-300)"></path>
+            <circle cx="66" cy="156" r="3.5" fill="var(--color-accent-2-400)"></circle>
+            <circle cx="42" cy="98" r="3" fill="var(--color-accent-300)"></circle>
+            <circle cx="178" cy="112" r="3" fill="var(--color-accent-2-300)"></circle>
+          </svg>
+        </div>
+        <div style="font-size:14px;max-width:300px;text-align:center" class="text-muted">Ready when you are — results appear on the right.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;align-self:start">
+        <div style="background:var(--color-surface);border-radius:28px;padding:20px 22px">
+          <h5 style="margin:0 0 8px">What we found</h5>
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px" class="text-muted">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--color-accent-2-600)" style="flex-shrink:0;margin-top:1px"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+            <span>Nothing yet — run something and results will light up here.</span>
+          </div>
+          <div style="margin-top:14px;font-size:11px" class="text-muted">How much to trust each finding:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+            <span class="tag tag-accent-2">measured</span><span class="tag tag-accent">reasoned</span><span class="tag tag-neutral">a hunch</span><span class="tag tag-outline">take lightly</span>
+          </div>
+        </div>
+        <div style="background:var(--color-surface);border-radius:28px;padding:20px 22px">
+          <h5 style="margin:0 0 10px">Watching for</h5>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:13px">
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Pathway correlations <span class="text-muted" style="margin-left:auto;font-size:11px">waiting</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Receptor activity <span class="text-muted" style="margin-left:auto;font-size:11px">waiting</span></div>
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Cortex engagement <span class="text-muted" style="margin-left:auto;font-size:11px">waiting</span></div>
+          </div>
+        </div>
+        <div style="background:var(--color-accent-100);color:var(--color-accent-800);border-radius:20px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:12.5px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+          Research only — never medical advice.
+        </div>
+        <button style="display:flex;align-items:center;justify-content:space-between;background:transparent;border:1px solid var(--color-divider);border-radius:999px;padding:9px 18px;font-size:12px;color:var(--color-text);font-family:var(--font-body)">
+          <span>Under the hood — session, backend, request IDs</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div style="font-size:11px;text-align:center" class="text-muted">session GRN-7Q2K4 · started 08:19 · mock model</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--color-divider);padding:10px 28px;font-size:11px;text-align:center" class="text-muted">© 2026 Magic Play Place · grown by Vlive Capital (Pty) Ltd</div>
+  </div>
+  </div></div>
+</section>
+
+<!-- ═══════════════════════════ 1b ═══════════════════════════ -->
+<section class="pv-sec" id="b">
+  <div class="pv-head">
+    <span class="pv-id">1b</span><span class="pv-name">Observatory workbench</span>
+    <p class="pv-note">The design dock's own recommendation. A big question as the heading, numbered steps down the left, and a large sage “sky” canvas that narrates what the model is doing. Results land in a “fresh sightings” row underneath. Friendlier mode names: Explore / Shape / Tune.</p>
+  </div>
+  <div class="pv-frame"><div class="pv-scale">
+  <div style="background:var(--color-bg);font-family:var(--font-body);color:var(--color-text)">
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 30px">
+      <img src="frontend/public/magic-play-place-logo-black.png" alt="" style="width:34px;height:auto">
+      <span style="font-family:var(--font-heading);font-size:19px">Magic Play Place</span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px" class="text-muted">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-500)"></span>
+        all systems calm · <span style="color:var(--color-accent-700)">under the hood</span>
+      </div>
+    </div>
+    <div style="padding:6px 30px 20px">
+      <h2 style="margin:0 0 10px;font-size:31px">What shall we explore today?</h2>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px">
+          <button style="padding:8px 20px;border-radius:999px;font-family:var(--font-heading);font-size:14px;background:var(--color-accent-2-700);color:#f0fae1;border:1px solid transparent">Explore</button>
+          <button style="padding:8px 20px;border-radius:999px;font-family:var(--font-heading);font-size:14px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">Shape</button>
+          <button style="padding:8px 20px;border-radius:999px;font-family:var(--font-heading);font-size:14px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">Tune</button>
+        </div>
+        <p style="margin:0;font-size:13.5px;max-width:520px" class="text-muted">Show the model a sentence, a picture, a clip or a sound — it predicts how a brain might respond, and tells you how sure it is.</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:430px 1fr;gap:26px;padding:0 30px 26px">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;gap:14px">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">1</div>
+          <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Pick a stimulus</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:var(--color-accent-2-700);color:#f0fae1;border:1px solid transparent">words</button>
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">a picture</button>
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">a clip</button>
+              <button style="padding:7px 16px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">a sound</button>
+            </div></div>
+        </div>
+        <div style="display:flex;gap:14px">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">2</div>
+          <div style="flex:1"><div style="font-family:var(--font-heading);font-size:16px;margin:5px 0 10px">Describe it</div>
+            <textarea class="input" placeholder="Try 'a calm forest at dawn'…" style="min-height:104px;border-radius:20px;background:var(--color-neutral-100)"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--color-accent-2-200);color:var(--color-accent-2-900);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:16px;flex-shrink:0">3</div>
+          <button style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;border:none;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);font-size:15px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+            Run it
+          </button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:var(--color-accent-100);color:var(--color-accent-800);border-radius:20px;padding:11px 16px;font-size:12.5px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+          Research only — never medical advice.
+        </div>
+      </div>
+      <div style="position:relative;border-radius:36px;background:var(--color-accent-2-100);min-height:520px;overflow:hidden">
+        <div style="position:absolute;top:20px;left:26px;font-size:12px;color:var(--color-accent-2-800);display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-600)"></span>
+          ready · Tribe v2 · modelling for neurotypical (adult)
+        </div>
+        <div style="position:absolute;top:38%;left:0;right:0;text-align:center;padding:0 40px">
+          <div style="font-family:var(--font-heading);font-size:22px;color:var(--color-accent-2-900)">Your results will appear here, star by star.</div>
+          <div style="font-size:13.5px;color:var(--color-accent-2-800);opacity:0.75;margin-top:6px">Run something on the left to add the first star.</div>
+        </div>
+        <svg viewBox="0 0 320 230" style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:360px;height:259px">
+          <ellipse cx="160" cy="118" rx="140" ry="42" transform="rotate(-12 160 118)" fill="none" stroke="var(--color-accent-2-600)" stroke-width="4" stroke-linecap="round"></ellipse>
+          <path d="M0 -52 C4.5 -17 17 -4.5 52 0 C17 4.5 4.5 17 0 52 C-4.5 17 -17 4.5 -52 0 C-17 -4.5 -4.5 -17 0 -52 Z" transform="translate(160 104)" fill="var(--color-accent-2-500)"></path>
+          <path d="M0 -18 C1.7 -5.6 5.6 -1.7 18 0 C5.6 1.7 1.7 5.6 0 18 C-1.7 5.6 -5.6 1.7 -18 0 C-5.6 -1.7 -1.7 -5.6 0 -18 Z" transform="translate(84 42)" fill="var(--color-accent-400)"></path>
+          <path d="M0 -13 C1.3 -4.2 4.2 -1.3 13 0 C4.2 1.3 1.3 4.2 0 13 C-1.3 4.2 -4.2 1.3 -13 0 C-4.2 -1.3 -1.3 -4.2 0 -13 Z" transform="translate(240 56)" fill="var(--color-accent-2-400)"></path>
+          <path d="M0 -11 C1.1 -3.6 3.6 -1.1 11 0 C3.6 1.1 1.1 3.6 0 11 C-1.1 3.6 -3.6 1.1 -11 0 C-3.6 -1.1 -1.1 -3.6 0 -11 Z" transform="translate(236 172)" fill="var(--color-accent-300)"></path>
+          <circle cx="96" cy="172" r="4" fill="var(--color-accent-2-400)"></circle>
+          <circle cx="52" cy="112" r="3.5" fill="var(--color-accent-300)"></circle>
+          <circle cx="272" cy="118" r="3.5" fill="var(--color-accent-2-300)"></circle>
+        </svg>
+        <svg viewBox="0 0 24 24" style="position:absolute;bottom:64px;left:11%;width:26px;height:26px;opacity:0.45" fill="var(--color-accent-2-500)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+        <svg viewBox="0 0 24 24" style="position:absolute;top:24%;right:13%;width:20px;height:20px;opacity:0.4" fill="var(--color-accent-400)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+      </div>
+    </div>
+    <div style="padding:0 30px 26px">
+      <h5 style="margin:0 0 12px">Fresh sightings</h5>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr) auto;gap:14px;align-items:stretch">
+        <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Pathway correlations<span class="tag tag-neutral" style="margin-left:auto">waiting</span></div>
+        <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Receptor activity<span class="tag tag-neutral" style="margin-left:auto">waiting</span></div>
+        <div style="background:var(--color-surface);border-radius:24px;padding:16px 18px;display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;background:var(--color-accent-2-400)"></span>Cortex engagement<span class="tag tag-neutral" style="margin-left:auto">waiting</span></div>
+        <div style="display:flex;flex-direction:column;justify-content:center;gap:5px;padding:0 6px">
+          <span style="font-size:11px" class="text-muted">trust labels:</span>
+          <div style="display:flex;gap:5px"><span class="tag tag-accent-2">measured</span><span class="tag tag-accent">reasoned</span><span class="tag tag-neutral">a hunch</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--color-divider);padding:10px 30px;font-size:11px;display:flex;justify-content:space-between" class="text-muted"><span>© 2026 Magic Play Place · grown by Vlive Capital</span><span>session GRN-7Q2K4 · mock model</span></div>
+  </div>
+  </div></div>
+</section>
+
+<!-- ═══════════════════════════ 1c ═══════════════════════════ -->
+<section class="pv-sec" id="c">
+  <div class="pv-head">
+    <span class="pv-id">1c</span><span class="pv-name">Star journal</span>
+    <p class="pv-note">The boldest rethink: a centred, editorial single column. One card holds the whole run setup; an “Observations” journal underneath accumulates each run as an entry. Least dense, best on narrow screens, furthest from a lab dashboard.</p>
+  </div>
+  <div class="pv-frame"><div class="pv-scale">
+  <div style="background:var(--color-bg);font-family:var(--font-body);color:var(--color-text);padding-bottom:26px">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 34px">
+      <img src="frontend/public/magic-play-place-logo-black.png" alt="" style="width:32px;height:auto">
+      <span style="font-family:var(--font-heading);font-size:18px">Magic Play Place</span>
+      <div style="margin-left:auto;display:flex;gap:22px">
+        <button style="background:transparent;border:none;font-family:var(--font-body);font-size:14px;padding:4px 2px;color:var(--color-accent-700);border-bottom:2px solid var(--color-accent);font-weight:600">Explore</button>
+        <button style="background:transparent;border:none;font-family:var(--font-body);font-size:14px;padding:4px 2px;color:color-mix(in srgb, var(--color-text) 55%, transparent);border-bottom:2px solid transparent">Shape</button>
+        <button style="background:transparent;border:none;font-family:var(--font-body);font-size:14px;padding:4px 2px;color:color-mix(in srgb, var(--color-text) 55%, transparent);border-bottom:2px solid transparent">Tune</button>
+      </div>
+    </div>
+    <div style="max-width:760px;margin:26px auto 0;text-align:center;padding:0 20px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="var(--color-accent-2-600)" style="display:inline-block"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+      <h1 style="margin:10px 0 8px;font-size:40px">Ask the model something.</h1>
+      <p style="margin:0 auto;font-size:15px;max-width:540px" class="text-muted">Show the model a sentence, a picture, a clip or a sound — it predicts how a brain might respond, and tells you how sure it is.</p>
+    </div>
+    <div style="max-width:720px;margin:26px auto 0;background:var(--color-surface);border-radius:36px;padding:26px 28px;box-shadow:var(--shadow-sm)">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <button style="padding:7px 18px;border-radius:999px;font-size:13px;background:#2e2b25;color:#f5ead8;border:1px solid transparent">words</button>
+          <button style="padding:7px 18px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">a picture</button>
+          <button style="padding:7px 18px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">a clip</button>
+          <button style="padding:7px 18px;border-radius:999px;font-size:13px;background:transparent;color:var(--color-text);border:1px solid var(--color-divider)">a sound</button>
+        </div>
+        <textarea class="input" placeholder="Describe something — 'a calm forest at dawn', 'a crowded train', 'my favourite song'…" style="min-height:120px;border-radius:24px;background:var(--color-neutral-100);font-size:15px;padding:16px 18px"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px">
+        <span style="font-size:12px" class="text-muted">modelling for neurotypical · adult · Tribe v2</span>
+        <button style="display:flex;align-items:center;gap:8px;padding:11px 24px;border-radius:999px;border:none;background:var(--color-accent);color:var(--color-bg);font-family:var(--font-heading);font-size:15px">
+          See what lights up
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+        </button>
+      </div>
+    </div>
+    <div style="max-width:720px;margin:30px auto 0;display:flex;align-items:center;gap:16px">
+      <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--color-accent-2-500)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+      <span style="flex:1;height:1px;background:var(--color-divider)"></span>
+    </div>
+    <div style="max-width:720px;margin:24px auto 0;padding:0 4px">
+      <h3 style="margin:0 0 4px;font-size:24px">Observations</h3>
+      <p style="margin:0 0 16px;font-size:13px" class="text-muted">Every run adds an observation here, labelled with how much to trust it.</p>
+      <div style="border:1.5px dashed var(--color-divider);border-radius:28px;padding:28px;text-align:center">
+        <div style="font-size:14px" class="text-muted">Your first observation will appear here after a run.</div>
+        <div style="display:flex;justify-content:center;gap:6px;margin-top:12px">
+          <span class="tag tag-accent-2">measured</span><span class="tag tag-accent">reasoned</span><span class="tag tag-neutral">a hunch</span><span class="tag tag-outline">take lightly</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;font-size:12px" class="text-muted">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--color-accent-700)"><path d="M12 1 C13 8 16 11 23 12 C16 13 13 16 12 23 C11 16 8 13 1 12 C8 11 11 8 12 1 Z"></path></svg>
+        Research only — never medical advice · © 2026 Magic Play Place · session GRN-7Q2K4
+      </div>
+    </div>
+  </div>
+  </div></div>
+</section>
+
+<div style="text-align:center;padding:10px 20px 40px;font:12px system-ui;color:rgba(0,0,0,.5)">
+  All three shown in their idle state, in Explore / Discovery mode.
+  For the loading, results and error states — and to click through the tabs and sliders — open <strong>Redesign Options.dc.html</strong> in this same folder.
+</div>
+
+<script>
+  // Draw each screen at its native 1360px, then scale it to fit the window.
+  function fit() {
+    document.querySelectorAll('.pv-frame').forEach(function (frame) {
+      var inner = frame.querySelector('.pv-scale');
+      var s = Math.min(1, frame.clientWidth / 1360);
+      inner.style.transform = 'scale(' + s + ')';
+      frame.style.height = inner.offsetHeight * s + 'px';
+    });
+  }
+  window.addEventListener('resize', fit);
+  window.addEventListener('load', fit);
+  fit();
+</script>
+</body>
+</html>
